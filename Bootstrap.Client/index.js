@@ -12,7 +12,6 @@ var BootstrapClient;
             _super.call(this);
 
             this.addPage(Test, "");
-
             this.start();
         }
         Index.prototype.initialize = function () {

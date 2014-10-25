@@ -112,7 +112,7 @@ var Vidyano;
 
         var Index = (function () {
             function Index(_serviceUri, _serviceHooks) {
-                if (typeof _serviceUri === "undefined") { _serviceUri = "https://2sky.bootstrap.be"; }
+                if (typeof _serviceUri === "undefined") { _serviceUri = "https://bootstrap.2sky.be"; }
                 if (typeof _serviceHooks === "undefined") { _serviceHooks = new IndexServiceHooks(); }
                 this._serviceUri = _serviceUri;
                 this._serviceHooks = _serviceHooks;

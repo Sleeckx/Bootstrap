@@ -82,7 +82,7 @@
         pageTarget: JQuery;
         errorTarget: JQuery;
 
-        constructor(private _serviceUri: string = "https://2sky.bootstrap.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks()) {
+        constructor(private _serviceUri: string = "https://bootstrap.2sky.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks()) {
             this.errorTarget = $("#error");
             this.pageTarget = $("#target");
         }

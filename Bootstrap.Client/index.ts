@@ -4,7 +4,6 @@
             super();
 
             this.addPage(Test, "");
-
             this.start();
         }
 
