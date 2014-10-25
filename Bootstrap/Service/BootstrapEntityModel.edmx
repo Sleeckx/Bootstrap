@@ -1,0 +1,295 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+<edmx:Runtime>
+<edmx:StorageModels>
+<Schema Namespace="BootstrapModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="BootstrapModelStoreContainer">
+    <EntitySet Name="Websites" EntityType="BootstrapModel.Store.Websites" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Products" EntityType="BootstrapModel.Store.Products" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Images" EntityType="BootstrapModel.Store.Images" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Pages" EntityType="BootstrapModel.Store.Pages" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="ProductImage" Association="BootstrapModel.Store.ProductImage">
+      <End Role="Product" EntitySet="Products" />
+      <End Role="Image" EntitySet="Images" />
+    </AssociationSet>
+    <AssociationSet Name="WebsitePage" Association="BootstrapModel.Store.WebsitePage">
+      <End Role="Website" EntitySet="Websites" />
+      <End Role="Page" EntitySet="Pages" />
+    </AssociationSet>
+    <AssociationSet Name="WebsiteProduct" Association="BootstrapModel.Store.WebsiteProduct">
+      <End Role="Website" EntitySet="Websites" />
+      <End Role="Product" EntitySet="Products" />
+    </AssociationSet>
+    <AssociationSet Name="WebsiteImage" Association="BootstrapModel.Store.WebsiteImage">
+      <End Role="Website" EntitySet="Websites" />
+      <End Role="Image" EntitySet="Images" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Websites">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Products">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar" Nullable="false" MaxLength="250" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Price" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="IsNew" Type="bit" Nullable="false" />
+    <Property Name="WebsiteProduct_Product_Id" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Images">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="ProductImage_Image_Id" Type="int" Nullable="true" />
+    <Property Name="WebsiteImage_Image_Id" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Pages">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="WebsitePage_Page_Id" Type="uniqueidentifier" Nullable="false" />
+  </EntityType>
+  <Association Name="ProductImage">
+    <End Role="Product" Type="BootstrapModel.Store.Products" Multiplicity="0..1" />
+    <End Role="Image" Type="BootstrapModel.Store.Images" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Product">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Image">
+        <PropertyRef Name="ProductImage_Image_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WebsitePage">
+    <End Role="Website" Type="BootstrapModel.Store.Websites" Multiplicity="1" />
+    <End Role="Page" Type="BootstrapModel.Store.Pages" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Website">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Page">
+        <PropertyRef Name="WebsitePage_Page_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WebsiteProduct">
+    <End Role="Website" Type="BootstrapModel.Store.Websites" Multiplicity="1" />
+    <End Role="Product" Type="BootstrapModel.Store.Products" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Website">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Product">
+        <PropertyRef Name="WebsiteProduct_Product_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="WebsiteImage">
+    <End Role="Website" Type="BootstrapModel.Store.Websites" Multiplicity="1" />
+    <End Role="Image" Type="BootstrapModel.Store.Images" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Website">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Image">
+        <PropertyRef Name="WebsiteImage_Image_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+<edmx:ConceptualModels>
+<Schema Namespace="BootstrapModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityContainer Name="BootstrapEntityModelContainer" p1:LazyLoadingEnabled="true" >
+          <EntitySet Name="Websites" EntityType="BootstrapModel.Website" />
+          <EntitySet Name="Products" EntityType="BootstrapModel.Product" />
+          <EntitySet Name="Images" EntityType="BootstrapModel.Image" />
+          <AssociationSet Name="ProductImage" Association="BootstrapModel.ProductImage">
+            <End Role="Product" EntitySet="Products" />
+            <End Role="Image" EntitySet="Images" />
+          </AssociationSet>
+          <EntitySet Name="Pages" EntityType="BootstrapModel.Page" />
+          <AssociationSet Name="WebsitePage" Association="BootstrapModel.WebsitePage">
+            <End Role="Website" EntitySet="Websites" />
+            <End Role="Page" EntitySet="Pages" />
+          </AssociationSet>
+          <AssociationSet Name="WebsiteProduct" Association="BootstrapModel.WebsiteProduct">
+            <End Role="Website" EntitySet="Websites" />
+            <End Role="Product" EntitySet="Products" />
+          </AssociationSet>
+          <AssociationSet Name="WebsiteImage" Association="BootstrapModel.WebsiteImage">
+            <End Role="Website" EntitySet="Websites" />
+            <End Role="Image" EntitySet="Images" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Website">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Pages" Relationship="BootstrapModel.WebsitePage" FromRole="Website" ToRole="Page" />
+          <NavigationProperty Name="Products" Relationship="BootstrapModel.WebsiteProduct" FromRole="Website" ToRole="Product" />
+          <NavigationProperty Name="Images" Relationship="BootstrapModel.WebsiteImage" FromRole="Website" ToRole="Image" />
+        </EntityType>
+        <EntityType Name="Product">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" />
+          <NavigationProperty Name="Images" Relationship="BootstrapModel.ProductImage" FromRole="Product" ToRole="Image" />
+          <Property Name="Price" Type="String" Nullable="false" />
+          <Property Name="IsNew" Type="Boolean" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Image">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="Name" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="ProductImage">
+          <End Type="BootstrapModel.Product" Role="Product" Multiplicity="0..1" />
+          <End Type="BootstrapModel.Image" Role="Image" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Page">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Guid" Nullable="false" annotation:StoreGeneratedPattern="None" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Content" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="WebsitePage">
+          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
+          <End Type="BootstrapModel.Page" Role="Page" Multiplicity="*" />
+        </Association>
+        <Association Name="WebsiteProduct">
+          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
+          <End Type="BootstrapModel.Product" Role="Product" Multiplicity="*" />
+        </Association>
+        <Association Name="WebsiteImage">
+          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
+          <End Type="BootstrapModel.Image" Role="Image" Multiplicity="*" />
+        </Association>
+</Schema>
+</edmx:ConceptualModels>
+<edmx:Mappings>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="BootstrapModelStoreContainer" CdmEntityContainer="BootstrapEntityModelContainer">
+    <EntitySetMapping Name="Websites">
+      <EntityTypeMapping TypeName="IsTypeOf(BootstrapModel.Website)">
+        <MappingFragment StoreEntitySet="Websites">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Products">
+      <EntityTypeMapping TypeName="IsTypeOf(BootstrapModel.Product)">
+        <MappingFragment StoreEntitySet="Products">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+          <ScalarProperty Name="Price" ColumnName="Price" />
+          <ScalarProperty Name="IsNew" ColumnName="IsNew" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Images">
+      <EntityTypeMapping TypeName="IsTypeOf(BootstrapModel.Image)">
+        <MappingFragment StoreEntitySet="Images">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Pages">
+      <EntityTypeMapping TypeName="IsTypeOf(BootstrapModel.Page)">
+        <MappingFragment StoreEntitySet="Pages">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Content" ColumnName="Content" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="ProductImage" TypeName="BootstrapModel.ProductImage" StoreEntitySet="Images">
+      <EndProperty Name="Product">
+        <ScalarProperty Name="Id" ColumnName="ProductImage_Image_Id" />
+      </EndProperty>
+      <EndProperty Name="Image">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+      <Condition ColumnName="ProductImage_Image_Id" IsNull="false" />
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="WebsitePage" TypeName="BootstrapModel.WebsitePage" StoreEntitySet="Pages">
+      <EndProperty Name="Website">
+        <ScalarProperty Name="Id" ColumnName="WebsitePage_Page_Id" />
+      </EndProperty>
+      <EndProperty Name="Page">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="WebsiteProduct" TypeName="BootstrapModel.WebsiteProduct" StoreEntitySet="Products">
+      <EndProperty Name="Website">
+        <ScalarProperty Name="Id" ColumnName="WebsiteProduct_Product_Id" />
+      </EndProperty>
+      <EndProperty Name="Product">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="WebsiteImage" TypeName="BootstrapModel.WebsiteImage" StoreEntitySet="Images">
+      <EndProperty Name="Website">
+        <ScalarProperty Name="Id" ColumnName="WebsiteImage_Image_Id" />
+      </EndProperty>
+      <EndProperty Name="Image">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+</edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="False" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams>
+      <Diagram DiagramId="6d2254d4485940e39315e398170d5a39" Name="Diagram1" >
+        <EntityTypeShape EntityType="BootstrapModel.Website" Width="1.5" PointX="6" PointY="3.375" />
+        <EntityTypeShape EntityType="BootstrapModel.Product" Width="1.5" PointX="2.875" PointY="1" />
+        <EntityTypeShape EntityType="BootstrapModel.Image" Width="1.5" PointX="7.75" PointY="1" />
+        <AssociationConnector Association="BootstrapModel.ProductImage" />
+        <EntityTypeShape EntityType="BootstrapModel.Page" Width="1.5" PointX="2.875" PointY="3.625" />
+        <AssociationConnector Association="BootstrapModel.WebsitePage" />
+        <AssociationConnector Association="BootstrapModel.WebsiteProduct" />
+        <AssociationConnector Association="BootstrapModel.WebsiteImage" />
+      </Diagram>
+    </Diagrams>
+  </Designer>
+</edmx:Edmx>
