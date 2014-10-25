@@ -1,13 +1,20 @@
-﻿var Vidyano;
+﻿var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Vidyano;
 (function (Vidyano) {
     (function (Pages) {
         var Page = (function () {
-            function Page(index) {
+            function Page(index, name) {
                 var _templateNames = [];
-                for (var _i = 0; _i < (arguments.length - 1); _i++) {
-                    _templateNames[_i] = arguments[_i + 1];
+                for (var _i = 0; _i < (arguments.length - 2); _i++) {
+                    _templateNames[_i] = arguments[_i + 2];
                 }
                 this.index = index;
+                this.name = name;
                 this._templateNames = _templateNames;
                 this.templates = {};
                 this.index.errorTarget.hide();
@@ -34,22 +41,39 @@
 
 
             Page.prototype.render = function (target) {
-                this.index.pageTarget.attr("data-page", this.constructor.toString().match(/function (.*)\(/)[1]);
+                this.index.pageTarget.attr("data-page", this.name);
                 this.isLoading = false;
             };
 
             Page.prototype.load = function () {
                 var _this = this;
-                var templates = this._templateNames.map(function (name) {
+                var templateLoaders = this._templateNames.map(function (name) {
                     return _this.templates[name] = new Template("/Templates/" + name + ".html");
-                });
-                return Promise.all(templates.map(function (template) {
+                }).map(function (template) {
                     return template._ready;
-                }));
+                });
+                var contentLoader = this.service.getPersistentObject(null, "Bootstrap.Page", this.name).then(function (page) {
+                    _this.content = page.getAttributeValue("Content");
+                });
+                return Promise.all(templateLoaders.concat([contentLoader]));
             };
             return Page;
         })();
         Pages.Page = Page;
+
+        var ContentPage = (function (_super) {
+            __extends(ContentPage, _super);
+            function ContentPage(index, name) {
+                _super.call(this, index, name);
+            }
+            ContentPage.prototype.render = function (target) {
+                _super.prototype.render.call(this, target);
+
+                target.html(this.content);
+            };
+            return ContentPage;
+        })(Page);
+        Pages.ContentPage = ContentPage;
 
         var Template = (function () {
             function Template(_file) {
@@ -88,7 +112,8 @@
 
         var Index = (function () {
             function Index(_serviceUri, _serviceHooks) {
-                if (typeof _serviceUri === "undefined") { _serviceUri = ""; }
+                if (typeof _serviceUri === "undefined") { _serviceUri = "https://2sky.bootstrap.be"; }
+                if (typeof _serviceHooks === "undefined") { _serviceHooks = new IndexServiceHooks(); }
                 this._serviceUri = _serviceUri;
                 this._serviceHooks = _serviceHooks;
                 this._isLoading = false;
@@ -186,6 +211,17 @@
             return Index;
         })();
         Pages.Index = Index;
+
+        var IndexServiceHooks = (function (_super) {
+            __extends(IndexServiceHooks, _super);
+            function IndexServiceHooks() {
+                _super.apply(this, arguments);
+            }
+            IndexServiceHooks.prototype.onSessionExpired = function () {
+                document.location.reload();
+            };
+            return IndexServiceHooks;
+        })(Vidyano.ServiceHooks);
     })(Vidyano.Pages || (Vidyano.Pages = {}));
     var Pages = Vidyano.Pages;
 })(Vidyano || (Vidyano = {}));

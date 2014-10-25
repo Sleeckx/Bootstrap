@@ -17,7 +17,7 @@
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
-    <UseIISExpress>true</UseIISExpress>
+    <UseIISExpress>false</UseIISExpress>
     <IISExpressSSLPort />
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
@@ -48,6 +48,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="CommonMark">
+      <HintPath>..\packages\CommonMark.NET.0.4.2\lib\net45\CommonMark.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -135,7 +138,13 @@
     </Compile>
     <Compile Include="Service\BootstrapQueries.cs" />
     <Compile Include="Service\BootstrapWeb.cs" />
+    <Compile Include="Service\ImageActions.cs" />
     <Compile Include="Service\ImageProcessor.cs" />
+    <Compile Include="Service\PageActions.cs" />
+    <Compile Include="Service\ProductActions.cs" />
+    <Compile Include="Service\UserActions.cs" />
+    <Compile Include="Service\WebsiteActions.cs" />
+    <Compile Include="StringHtmlExtensions.cs" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\crossroads.min.js" />
     <Content Include="Scripts\hasher.min.js" />
@@ -216,6 +225,9 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <TypeScriptGeneratesDeclarations>True</TypeScriptGeneratesDeclarations>
+  </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets" Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\TypeScript\Microsoft.TypeScript.targets')" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
@@ -230,7 +242,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>25614</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:25614/</IISUrl>
+          <IISUrl>http://localhost/Bootstrap</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

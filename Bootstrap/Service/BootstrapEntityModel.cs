@@ -19,10 +19,9 @@ using System.Xml.Serialization;
 [assembly: EdmSchemaAttribute()]
 #region EDM Relationship Metadata
 
-[assembly: EdmRelationshipAttribute("BootstrapModel", "ProductImage", "Product", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.ZeroOrOne, typeof(Bootstrap.Service.Product), "Image", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Image))]
-[assembly: EdmRelationshipAttribute("BootstrapModel", "WebsitePage", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Page", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Page))]
-[assembly: EdmRelationshipAttribute("BootstrapModel", "WebsiteProduct", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Product", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Product))]
-[assembly: EdmRelationshipAttribute("BootstrapModel", "WebsiteImage", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Image", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Image))]
+[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_WebsitePage", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Page", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Page))]
+[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_Users_Websites", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "User", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.User), true)]
+[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_WebsiteProduct", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Product", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Product))]
 
 #endregion
 
@@ -93,38 +92,6 @@ namespace Bootstrap.Service
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        public ObjectSet<Product> Products
-        {
-            get
-            {
-                if ((_Products == null))
-                {
-                    _Products = base.CreateObjectSet<Product>("Products");
-                }
-                return _Products;
-            }
-        }
-        private ObjectSet<Product> _Products;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<Image> Images
-        {
-            get
-            {
-                if ((_Images == null))
-                {
-                    _Images = base.CreateObjectSet<Image>("Images");
-                }
-                return _Images;
-            }
-        }
-        private ObjectSet<Image> _Images;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
         public ObjectSet<Page> Pages
         {
             get
@@ -137,6 +104,38 @@ namespace Bootstrap.Service
             }
         }
         private ObjectSet<Page> _Pages;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<User> Users
+        {
+            get
+            {
+                if ((_Users == null))
+                {
+                    _Users = base.CreateObjectSet<User>("Users");
+                }
+                return _Users;
+            }
+        }
+        private ObjectSet<User> _Users;
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        public ObjectSet<Product> Products
+        {
+            get
+            {
+                if ((_Products == null))
+                {
+                    _Products = base.CreateObjectSet<Product>("Products");
+                }
+                return _Products;
+            }
+        }
+        private ObjectSet<Product> _Products;
 
         #endregion
 
@@ -151,27 +150,27 @@ namespace Bootstrap.Service
         }
     
         /// <summary>
-        /// Deprecated Method for adding a new object to the Products EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToProducts(Product product)
-        {
-            base.AddObject("Products", product);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Images EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToImages(Image image)
-        {
-            base.AddObject("Images", image);
-        }
-    
-        /// <summary>
         /// Deprecated Method for adding a new object to the Pages EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
         /// </summary>
         public void AddToPages(Page page)
         {
             base.AddObject("Pages", page);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the Users EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToUsers(User user)
+        {
+            base.AddObject("Users", user);
+        }
+    
+        /// <summary>
+        /// Deprecated Method for adding a new object to the Products EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
+        /// </summary>
+        public void AddToProducts(Product product)
+        {
+            base.AddObject("Products", product);
         }
 
         #endregion
@@ -181,88 +180,6 @@ namespace Bootstrap.Service
     #endregion
 
     #region Entities
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="Image")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class Image : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new Image object.
-        /// </summary>
-        /// <param name="id">Initial value of the Id property.</param>
-        /// <param name="name">Initial value of the Name property.</param>
-        public static Image CreateImage(global::System.Guid id, global::System.String name)
-        {
-            Image image = new Image();
-            image.Id = id;
-            image.Name = name;
-            return image;
-        }
-
-        #endregion
-
-        #region Simple Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Id
-        {
-            get
-            {
-                return _Id;
-            }
-            set
-            {
-                if (_Id != value)
-                {
-                    OnIdChanging(value);
-                    ReportPropertyChanging("Id");
-                    _Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Id");
-                    OnIdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Id;
-        partial void OnIdChanging(global::System.Guid value);
-        partial void OnIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Name
-        {
-            get
-            {
-                return _Name;
-            }
-            set
-            {
-                OnNameChanging(value);
-                ReportPropertyChanging("Name");
-                _Name = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Name");
-                OnNameChanged();
-            }
-        }
-        private global::System.String _Name;
-        partial void OnNameChanging(global::System.String value);
-        partial void OnNameChanged();
-
-        #endregion
-
-    }
     
     /// <summary>
     /// No Metadata Documentation available.
@@ -370,6 +287,48 @@ namespace Bootstrap.Service
 
         #endregion
 
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsitePage", "Website")]
+        public Website Website
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Website> WebsiteReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website", value);
+                }
+            }
+        }
+
+        #endregion
+
     }
     
     /// <summary>
@@ -388,15 +347,13 @@ namespace Bootstrap.Service
         /// <param name="id">Initial value of the Id property.</param>
         /// <param name="name">Initial value of the Name property.</param>
         /// <param name="description">Initial value of the Description property.</param>
-        /// <param name="price">Initial value of the Price property.</param>
         /// <param name="isNew">Initial value of the IsNew property.</param>
-        public static Product CreateProduct(global::System.Int32 id, global::System.String name, global::System.String description, global::System.String price, global::System.Boolean isNew)
+        public static Product CreateProduct(global::System.Guid id, global::System.String name, global::System.String description, global::System.Boolean isNew)
         {
             Product product = new Product();
             product.Id = id;
             product.Name = name;
             product.Description = description;
-            product.Price = price;
             product.IsNew = isNew;
             return product;
         }
@@ -410,7 +367,7 @@ namespace Bootstrap.Service
         /// </summary>
         [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
         [DataMemberAttribute()]
-        public global::System.Int32 Id
+        public global::System.Guid Id
         {
             get
             {
@@ -428,8 +385,8 @@ namespace Bootstrap.Service
                 }
             }
         }
-        private global::System.Int32 _Id;
-        partial void OnIdChanging(global::System.Int32 value);
+        private global::System.Guid _Id;
+        partial void OnIdChanging(global::System.Guid value);
         partial void OnIdChanged();
     
         /// <summary>
@@ -483,9 +440,9 @@ namespace Bootstrap.Service
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        public global::System.String Price
+        public Nullable<global::System.Decimal> Price
         {
             get
             {
@@ -495,13 +452,13 @@ namespace Bootstrap.Service
             {
                 OnPriceChanging(value);
                 ReportPropertyChanging("Price");
-                _Price = StructuralObject.SetValidValue(value, false);
+                _Price = StructuralObject.SetValidValue(value);
                 ReportPropertyChanged("Price");
                 OnPriceChanged();
             }
         }
-        private global::System.String _Price;
-        partial void OnPriceChanging(global::System.String value);
+        private Nullable<global::System.Decimal> _Price;
+        partial void OnPriceChanging(Nullable<global::System.Decimal> value);
         partial void OnPriceChanged();
     
         /// <summary>
@@ -538,18 +495,161 @@ namespace Bootstrap.Service
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "ProductImage", "Image")]
-        public EntityCollection<Image> Images
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsiteProduct", "Website")]
+        public Website Website
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Image>("BootstrapModel.ProductImage", "Image");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Website> WebsiteReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Image>("BootstrapModel.ProductImage", "Image", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website", value);
+                }
+            }
+        }
+
+        #endregion
+
+    }
+    
+    /// <summary>
+    /// No Metadata Documentation available.
+    /// </summary>
+    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="User")]
+    [Serializable()]
+    [DataContractAttribute(IsReference=true)]
+    public partial class User : EntityObject
+    {
+        #region Factory Method
+    
+        /// <summary>
+        /// Create a new User object.
+        /// </summary>
+        /// <param name="id">Initial value of the Id property.</param>
+        /// <param name="website_Id">Initial value of the Website_Id property.</param>
+        public static User CreateUser(global::System.Guid id, global::System.Guid website_Id)
+        {
+            User user = new User();
+            user.Id = id;
+            user.Website_Id = website_Id;
+            return user;
+        }
+
+        #endregion
+
+        #region Simple Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid Id
+        {
+            get
+            {
+                return _Id;
+            }
+            set
+            {
+                if (_Id != value)
+                {
+                    OnIdChanging(value);
+                    ReportPropertyChanging("Id");
+                    _Id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("Id");
+                    OnIdChanged();
+                }
+            }
+        }
+        private global::System.Guid _Id;
+        partial void OnIdChanging(global::System.Guid value);
+        partial void OnIdChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
+        [DataMemberAttribute()]
+        public global::System.Guid Website_Id
+        {
+            get
+            {
+                return _Website_Id;
+            }
+            set
+            {
+                if (_Website_Id != value)
+                {
+                    OnWebsite_IdChanging(value);
+                    ReportPropertyChanging("Website_Id");
+                    _Website_Id = StructuralObject.SetValidValue(value);
+                    ReportPropertyChanged("Website_Id");
+                    OnWebsite_IdChanged();
+                }
+            }
+        }
+        private global::System.Guid _Website_Id;
+        partial void OnWebsite_IdChanging(global::System.Guid value);
+        partial void OnWebsite_IdChanged();
+
+        #endregion
+
+        #region Navigation Properties
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_Users_Websites", "Website")]
+        public Website Website
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website").Value;
+            }
+            set
+            {
+                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website").Value = value;
+            }
+        }
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [BrowsableAttribute(false)]
+        [DataMemberAttribute()]
+        public EntityReference<Website> WebsiteReference
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website", value);
                 }
             }
         }
@@ -646,18 +746,18 @@ namespace Bootstrap.Service
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "WebsitePage", "Page")]
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsitePage", "Page")]
         public EntityCollection<Page> Pages
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Page>("BootstrapModel.WebsitePage", "Page");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Page>("BootstrapModel.FK_WebsitePage", "Page");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Page>("BootstrapModel.WebsitePage", "Page", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Page>("BootstrapModel.FK_WebsitePage", "Page", value);
                 }
             }
         }
@@ -668,40 +768,40 @@ namespace Bootstrap.Service
         [XmlIgnoreAttribute()]
         [SoapIgnoreAttribute()]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "WebsiteProduct", "Product")]
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_Users_Websites", "User")]
+        public EntityCollection<User> Users
+        {
+            get
+            {
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<User>("BootstrapModel.FK_Users_Websites", "User");
+            }
+            set
+            {
+                if ((value != null))
+                {
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<User>("BootstrapModel.FK_Users_Websites", "User", value);
+                }
+            }
+        }
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [XmlIgnoreAttribute()]
+        [SoapIgnoreAttribute()]
+        [DataMemberAttribute()]
+        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsiteProduct", "Product")]
         public EntityCollection<Product> Products
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Product>("BootstrapModel.WebsiteProduct", "Product");
+                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Product>("BootstrapModel.FK_WebsiteProduct", "Product");
             }
             set
             {
                 if ((value != null))
                 {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Product>("BootstrapModel.WebsiteProduct", "Product", value);
-                }
-            }
-        }
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "WebsiteImage", "Image")]
-        public EntityCollection<Image> Images
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Image>("BootstrapModel.WebsiteImage", "Image");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Image>("BootstrapModel.WebsiteImage", "Image", value);
+                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Product>("BootstrapModel.FK_WebsiteProduct", "Product", value);
                 }
             }
         }

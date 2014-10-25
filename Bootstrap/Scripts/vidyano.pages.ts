@@ -1,8 +1,9 @@
 ﻿module Vidyano.Pages {
     export class Page {
         templates: { [key: string]: Template } = {};
+        content: string;
 
-        constructor(public index: Index, ...private _templateNames: string[]) {
+        constructor(public index: Index, public name: string, ...private _templateNames: string[]) {
             this.index.errorTarget.hide();
             this.index.pageTarget.empty();
         }
@@ -20,13 +21,28 @@
         }
 
         render(target: JQuery) {
-            this.index.pageTarget.attr("data-page", this.constructor.toString().match(/function (.*)\(/)[1]);
+            this.index.pageTarget.attr("data-page", this.name);
             this.isLoading = false;
         }
 
         load(): Promise<any> {
-            var templates = this._templateNames.map(name => this.templates[name] = new Template("/Templates/" + name + ".html"));
-            return Promise.all(templates.map(template => (<any>template)._ready));
+            var templateLoaders = this._templateNames.map(name => this.templates[name] = new Template("/Templates/" + name + ".html")).map(template => (<any>template)._ready);
+            var contentLoader = this.service.getPersistentObject(null, "Bootstrap.Page", this.name).then(page => {
+                this.content = page.getAttributeValue("Content");
+            });
+            return Promise.all(templateLoaders.concat([contentLoader]));
+        }
+    }
+
+    export class ContentPage extends Page {
+        constructor(index: Index, name: string) {
+            super(index, name);
+        }
+
+        render(target: JQuery) {
+            super.render(target);
+
+            target.html(this.content);
         }
     }
 
@@ -66,7 +82,7 @@
         pageTarget: JQuery;
         errorTarget: JQuery;
 
-        constructor(private _serviceUri: string = "", private _serviceHooks?: Vidyano.ServiceHooks) {
+        constructor(private _serviceUri: string = "https://2sky.bootstrap.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks()) {
             this.errorTarget = $("#error");
             this.pageTarget = $("#target");
         }
@@ -140,6 +156,12 @@
                 (<any>hasher).changed.add(parseHash);
                 (<any>hasher).init();
             });
+        }
+    }
+
+    class IndexServiceHooks extends Vidyano.ServiceHooks {
+        onSessionExpired() {
+            document.location.reload();
         }
     }
 }

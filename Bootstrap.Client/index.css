@@ -1,0 +1,84 @@
+﻿#target[data-page="ShippingPage"] h2 {
+  color: #175e77;
+}
+.error {
+  display: none;
+  margin-top: 100px;
+  text-align: center;
+}
+.error .msg {
+  color: #c80000;
+}
+.error .action {
+  border: none;
+  outline: none;
+  margin: 1em 0 0 0;
+  background-color: #175e77;
+  color: white;
+  padding: 0.5em 1em;
+}
+#loading {
+  display: none;
+  margin: 100px auto;
+  width: 50px;
+  height: 50px;
+  position: relative;
+  text-align: center;
+  -webkit-animation: rotate 2.0s infinite linear;
+  animation: rotate 2.0s infinite linear;
+}
+#loading.show {
+  display: block;
+}
+#loading > div {
+  width: 60%;
+  height: 60%;
+  display: inline-block;
+  position: absolute;
+  top: 0;
+  border-radius: 100%;
+  -webkit-animation: bounce 2s infinite ease-in-out;
+  animation: bounce 2s infinite ease-in-out;
+}
+#loading > div:nth-child(1) {
+  background-color: #061a22;
+}
+#loading > div:nth-child(2) {
+  background-color: #175e77;
+  top: auto;
+  bottom: 0;
+  -webkit-animation-delay: -1s;
+  animation-delay: -1s;
+}
+@-webkit-keyframes rotate {
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+@keyframes rotate {
+  100% {
+    transform: rotate(360deg);
+    -webkit-transform: rotate(360deg);
+  }
+}
+@-webkit-keyframes bounce {
+  0%,
+  100% {
+    -webkit-transform: scale(0);
+  }
+  50% {
+    -webkit-transform: scale(1);
+  }
+}
+@keyframes bounce {
+  0%,
+  100% {
+    transform: scale(0);
+    -webkit-transform: scale(0);
+  }
+  50% {
+    transform: scale(1);
+    -webkit-transform: scale(1);
+  }
+}
+/*# sourceMappingURL=index.css.map */
