@@ -1,74 +1,41 @@
-﻿using System;
+﻿using Bootstrap.Service;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 using System.Web;
 
 namespace Bootstrap
 {
     public class ImagesController : ApiController
     {
-        private static readonly Dictionary<Guid, byte[]> thumbImages = new Dictionary<Guid, byte[]>();
-
-        public HttpResponseMessage Get(string id)
+        public async Task<HttpResponseMessage> Get(string website, string name)
         {
-            var thumb = false;
-            if (id.Contains(";"))
+            using (var context = new BootstrapEntityModelContainer())
             {
-                var splitId = id.Split(new [] { ';' }, 2);
-                if (splitId.Length == 2 && splitId[1].ToLower() == "thumb")
+                var ws = context.Websites.FirstOrDefault(w => w.Name == website);
+                if (ws != null)
                 {
-                    thumb = true;
-                    id = splitId[0];
+                    var blob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(ws.Id) + name);
+                    if (await blob.ExistsAsync())
+                    {
+                        HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);
+                        var blobStream = await blob.OpenReadAsync();
+
+                        message.Content = new StreamContent(blobStream);
+                        message.Content.Headers.ContentLength = blob.Properties.Length;
+                        message.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(blob.Properties.ContentType);
+
+                        return message; 
+                    }
                 }
             }
 
-            //var imageId = Guid.Parse(id);
-            //using (var context = new Service.BootstrapEntityModelContainer())
-            //{
-            //    var image = context.Images.Where(img => img.Id == imageId).FirstOrDefault();
-            //    if (image != null)
-            //    {
-            //        if (thumb)
-            //        {
-            //            byte[] thumbData;
-            //            if (!thumbImages.TryGetValue(imageId, out thumbData))
-            //            {
-            //                thumbData = Service.ImageProcessor.ResizeImage(image.ImageFull, 200);
-            //                thumbImages[imageId] = thumbData;
-            //            }
-            //            image.ImageFull = thumbData;
-            //        }
-
-            //        string hash;
-            //        using (var hasher = SHA1.Create())
-            //            hash = "\"" + Convert.ToBase64String(hasher.ComputeHash(image.ImageFull)) + "\"";
-
-            //        if (Request.Headers.IfNoneMatch.Any(ifm => ifm.Tag == hash))
-            //            return new HttpResponseMessage(HttpStatusCode.NotModified);
-
-            //        var message = new HttpResponseMessage();
-            //        message.Headers.ETag = new EntityTagHeaderValue(hash);
-            //        message.Content = new ByteArrayContent(image.ImageFull);
-            //        if (image.ImageFull[0] == 0x89 && image.ImageFull[1] == 0x50 && image.ImageFull[2] == 0x4E && image.ImageFull[3] == 0x47)
-            //            message.Content.Headers.ContentType = new MediaTypeHeaderValue("image/png");
-            //        else
-            //            message.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-            //        return message;
-            //    }
-            //    else
-            //        RemoveThumb(imageId);
-            //}
-
-            return new HttpResponseMessage(HttpStatusCode.NoContent);
-        }
-
-        internal static void RemoveThumb(Guid id)
-        {
-            thumbImages.Remove(id);
+            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File not found"); 
         }
     }
 }

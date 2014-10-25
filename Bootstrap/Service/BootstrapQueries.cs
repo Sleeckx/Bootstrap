@@ -18,16 +18,17 @@ namespace Bootstrap.Service
 
         public IEnumerable<object> WebsiteImages(CustomQueryArgs e)
         {
-            VerifyWebsiteAccess(e.Parent.Id);
+            var websiteId = Guid.Parse(e.Parent.ObjectId);
+            VerifyWebsiteAccess(websiteId);
 
-            var prefix = ImageActions.GetWebsitePrefix(e.Parent.Id);
-            return ImageActions.WebsitesContainer.ListBlobs(prefix, true, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
+            var prefix = ImageActions.GetWebsitePrefix(websiteId);
+            return ImageActions.WebsitesContainer.ListBlobs(prefix, false, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
                 .Select(blob =>
                 {
                     var name = blob.Name.Replace(prefix, "");
 
-                    var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(e.Parent.Id) + name);
-                    var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(e.Parent.Id, true) + name);
+                    var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + name);
+                    var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(e.Parent.ObjectId, true) + name);
 
                     return new { Id = fullBlob.Uri.ToString(), Name = name, QueryImage = thumbBlob.Uri.ToString() };
                 });
@@ -39,12 +40,12 @@ namespace Bootstrap.Service
             VerifyProductAccess(product.Id);
 
             var prefix = ImageActions.GetProductPrefix(product.Website.Id, product.Id);
-            return ImageActions.WebsitesContainer.ListBlobs(prefix, true, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
+            return ImageActions.WebsitesContainer.ListBlobs(prefix, false, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
                 .Select(blob =>
                 {
                     var name = blob.Name.Replace(prefix, "");
 
-                    var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetProductPrefix(product.Website.Id, product.Id) + name);
+                    var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + name);
                     var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetProductPrefix(product.Website.Id, product.Id, true) + name);
 
                     return new { Id = fullBlob.Uri.ToString(), Name = name, QueryImage = thumbBlob.Uri.ToString() };

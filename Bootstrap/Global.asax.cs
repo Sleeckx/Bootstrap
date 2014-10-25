@@ -8,8 +8,8 @@ namespace Bootstrap
     {
         protected void Application_Start(object sender, EventArgs e)
         {
-            WebControllerFactory.MapHttpRoute("api", "api/{action}/{id}", new { controller = "Api", action = "Get", id = WebControllerFactory.OptionalParameter });
-            WebControllerFactory.MapHttpRoute("images", "images/{id}", new { controller = "Images", action = "Get", id = WebControllerFactory.OptionalParameter });
+            WebControllerFactory.MapHttpRoute("images", "images/{website}/{name}", new { controller = "Images", action = "Get" });
+            WebControllerFactory.MapHttpRoute("api", "api", new { controller = "Api", action = "Get" });
             WebControllerFactory.MapVidyanoRoute();
         }
     }

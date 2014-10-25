@@ -3,6 +3,7 @@ using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using Vidyano.Core.Extensions;
@@ -23,10 +24,11 @@ namespace Bootstrap.Service
                 string prefix, thumbPrefix;
                 if (obj.Parent.Type == "Website")
                 {
-                    Context.VerifyWebsiteAccess(obj.Parent.Id);
+                    var websiteId = Guid.Parse(obj.Parent.ObjectId);
+                    Context.VerifyWebsiteAccess(websiteId);
 
-                    prefix = GetWebsitePrefix(obj.Parent.Id);
-                    thumbPrefix = GetWebsitePrefix(obj.Parent.Id, true);
+                    prefix = GetWebsitePrefix(websiteId);
+                    thumbPrefix = GetWebsitePrefix(websiteId, true);
                 }
                 else if (obj.Parent.Type == "Product")
                 {
@@ -51,10 +53,11 @@ namespace Bootstrap.Service
             string prefix, thumbPrefix;
             if (parent.Type == "Website")
             {
-                Context.VerifyWebsiteAccess(parent.Id);
+                var websiteId = Guid.Parse(parent.ObjectId);
+                Context.VerifyWebsiteAccess(websiteId);
 
-                prefix = GetWebsitePrefix(parent.Id);
-                thumbPrefix = GetWebsitePrefix(parent.Id, true);
+                prefix = GetWebsitePrefix(websiteId);
+                thumbPrefix = GetWebsitePrefix(websiteId, true);
             }
             else if (parent.Type == "Product")
             {
@@ -78,6 +81,27 @@ namespace Bootstrap.Service
         {
             var blob = WebsitesContainer.GetBlockBlobReference(name);
             blob.UploadFromByteArray(image, 0, image.Length);
+
+            var extension = Path.GetExtension(blob.Uri.AbsoluteUri);
+            switch (extension)
+            {
+                case ".png":
+                    blob.Properties.ContentType = "image/png";
+                    break;
+                case ".jpg":
+                case ".jpeg":
+                    blob.Properties.ContentType = "image/jpeg";
+                    break;
+                case ".gif":
+                    blob.Properties.ContentType = "image/gif";
+                    break;
+                case ".bmp":
+                    blob.Properties.ContentType = "image/bmp";
+                    break;
+                default:
+                    break;
+            }
+            blob.SetProperties();
         }
 
         private void DeleteImage(string name)
@@ -92,7 +116,14 @@ namespace Bootstrap.Service
                 if (_WebsitesContainer != null)
                     return _WebsitesContainer;
 
-                var storageAccount = CloudStorageAccount.Parse(Manager.Current.GetSetting("StorageConnectionString"));
+                var storageConnectionString = Manager.Current != null ? Manager.Current.GetSetting("StorageConnectionString") : null;
+                if (storageConnectionString == null)
+                {
+                    using (var context = new BootstrapEntityModelContainer())
+                        storageConnectionString = context.Settings.First(s => s.Key == "StorageConnectionString").Value;
+                }
+
+                var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
                 var blobClient = storageAccount.CreateCloudBlobClient();
 
                 return _WebsitesContainer = blobClient.GetContainerReference("websites");
@@ -101,7 +132,7 @@ namespace Bootstrap.Service
 
         internal static string GetWebsitePrefix(string id, bool thumb = false)
         {
-            return id + (thumb ? "/thumbs" : "") + "/global/";
+            return id + (thumb ? "/thumbs" : "") + "/";
         }
 
         internal static string GetWebsitePrefix(Guid id, bool thumb = false)
@@ -111,7 +142,7 @@ namespace Bootstrap.Service
 
         internal static string GetProductPrefix(string websiteId, string productId, bool thumb = false)
         {
-            return websiteId + (thumb ? "/thumbs" : "") + "/" + productId + "/";
+            return websiteId + "/" + productId + (thumb ? "/thumbs" : "") + "/";
         }
 
         internal static string GetProductPrefix(Guid websiteId, Guid productId, bool thumb = false)
