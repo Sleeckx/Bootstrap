@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Vidyano.Core.Extensions;
 using Vidyano.Service;
 using Vidyano.Service.Charts;
@@ -32,7 +33,23 @@ namespace Bootstrap.Service
                         obj.ObjectId = Convert.ToString(page.Id);
                         base.OnLoad(obj, parent);
 
-                        obj["Content"].SetOriginalValue(CommonMarkConverter.Convert((string)obj["Content"]));
+                        var content = Regex.Replace((string)obj["Content"], @"\(((.*) ""(.*)"")\)", new MatchEvaluator(match =>
+                        {
+                            var imageName = match.Groups[2].Value;
+                            var imageTitle = match.Groups[3].Value;
+
+                            var prefix = ImageActions.GetPagePrefix(website.Id, page.Id);
+                            var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + imageName);
+                            var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + "thumbs/" + imageName);
+
+                            return string.Format(@"<a class='bootstrap-image-link' href='{0}' data-lightbox='{1}' data-title='{2}'><img class='bootstrap-image' src='{3}' alt='' /></a>",
+                                fullBlob.Uri.ToString(),
+                                page.Name,
+                                imageTitle,
+                                thumbBlob.Uri.ToString());
+                        }));
+
+                        obj["Content"].SetOriginalValue(CommonMarkConverter.Convert(content));
                     }
                 }
             }

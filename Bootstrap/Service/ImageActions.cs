@@ -21,14 +21,13 @@ namespace Bootstrap.Service
         {
             if (CheckRules(obj))
             {
-                string prefix, thumbPrefix;
+                string prefix;
                 if (obj.Parent.Type == "Website")
                 {
                     var websiteId = Guid.Parse(obj.Parent.ObjectId);
                     Context.VerifyWebsiteAccess(websiteId);
 
                     prefix = GetWebsitePrefix(websiteId);
-                    thumbPrefix = GetWebsitePrefix(websiteId, true);
                 }
                 else if (obj.Parent.Type == "Product")
                 {
@@ -36,13 +35,19 @@ namespace Bootstrap.Service
                     Context.VerifyProductAccess(product.Id);
 
                     prefix = GetProductPrefix(product.Website.Id, product.Id);
-                    thumbPrefix = GetProductPrefix(product.Website.Id, product.Id, true);
+                }
+                else if (obj.Parent.Type == "Page")
+                {
+                    var page = Context.GetEntity<Page>(obj.Parent);
+                    Context.VerifyPageAccess(page.Id);
+
+                    prefix = GetPagePrefix(page.Website.Id, page.Id);
                 }
                 else
                     throw new InvalidOperationException("Invalid parent type.");
 
                 UploadImage(prefix + (string)obj.GetAttributeValue("Name"), (byte[])obj.GetAttributeValue("UploadImage"));
-                UploadImage(thumbPrefix + (string)obj.GetAttributeValue("Name"), ImageProcessor.ResizeImage((byte[])obj.GetAttributeValue("UploadImage"), 200));
+                UploadImage(prefix + "thumbs/" + (string)obj.GetAttributeValue("Name"), ImageProcessor.ResizeImage((byte[])obj.GetAttributeValue("UploadImage"), 200));
             }
             else
                 base.SaveNew(obj);
@@ -50,14 +55,13 @@ namespace Bootstrap.Service
 
         public override void OnDelete(PersistentObject parent, IEnumerable<object> entities, Query query, QueryResultItem[] selectedItems)
         {
-            string prefix, thumbPrefix;
+            string prefix;
             if (parent.Type == "Website")
             {
                 var websiteId = Guid.Parse(parent.ObjectId);
                 Context.VerifyWebsiteAccess(websiteId);
 
                 prefix = GetWebsitePrefix(websiteId);
-                thumbPrefix = GetWebsitePrefix(websiteId, true);
             }
             else if (parent.Type == "Product")
             {
@@ -65,7 +69,13 @@ namespace Bootstrap.Service
                 Context.VerifyProductAccess(product.Id);
 
                 prefix = GetProductPrefix(product.Website.Id, product.Id);
-                thumbPrefix = GetProductPrefix(product.Website.Id, product.Id, true);
+            }
+            else if (parent.Type == "Page")
+            {
+                var page = Context.GetEntity<Page>(parent);
+                Context.VerifyPageAccess(page.Id);
+
+                prefix = GetPagePrefix(page.Website.Id, page.Id);
             }
             else
                 throw new InvalidOperationException("Invalid parent type.");
@@ -73,7 +83,7 @@ namespace Bootstrap.Service
             selectedItems.Run(item =>
             {
                 DeleteImage(prefix + item.Id);
-                DeleteImage(thumbPrefix + item.Id);
+                DeleteImage(prefix + "thumbs/" + item.Id);
             });
         }
 
@@ -130,24 +140,34 @@ namespace Bootstrap.Service
             }
         }
 
-        internal static string GetWebsitePrefix(string id, bool thumb = false)
+        internal static string GetWebsitePrefix(string id)
         {
-            return id + (thumb ? "/thumbs" : "") + "/";
+            return id + "/";
         }
 
-        internal static string GetWebsitePrefix(Guid id, bool thumb = false)
+        internal static string GetWebsitePrefix(Guid id)
         {
-            return GetWebsitePrefix(id.ToString(), thumb);
+            return GetWebsitePrefix(id.ToString());
         }
 
-        internal static string GetProductPrefix(string websiteId, string productId, bool thumb = false)
+        internal static string GetProductPrefix(string websiteId, string productId)
         {
-            return websiteId + "/" + productId + (thumb ? "/thumbs" : "") + "/";
+            return websiteId + "/products/" + productId + "/";
         }
 
-        internal static string GetProductPrefix(Guid websiteId, Guid productId, bool thumb = false)
+        internal static string GetProductPrefix(Guid websiteId, Guid productId)
         {
-            return GetProductPrefix(websiteId.ToString(), productId.ToString(), thumb);
+            return GetProductPrefix(websiteId.ToString(), productId.ToString());
+        }
+
+        internal static string GetPagePrefix(string websiteId, string pageId)
+        {
+            return websiteId + "/pages/" + pageId + "/";
+        }
+
+        internal static string GetPagePrefix(Guid websiteId, Guid pageId)
+        {
+            return GetPagePrefix(websiteId.ToString(), pageId.ToString());
         }
     }
 }

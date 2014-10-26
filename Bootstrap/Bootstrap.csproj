@@ -118,7 +118,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ApiController.cs" />
+    <Compile Include="JSController.cs" />
+    <Compile Include="CssController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -146,21 +147,45 @@
     <Compile Include="Service\WebsiteActions.cs" />
     <Compile Include="StringHtmlExtensions.cs" />
     <Content Include="Global.asax" />
+    <Content Include="Images\close.png" />
+    <Content Include="Images\loading.gif" />
+    <Content Include="Images\next.png" />
+    <Content Include="Images\prev.png" />
+    <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\crossroads.min.js" />
     <Content Include="Scripts\hasher.min.js" />
+    <Content Include="Scripts\jquery-2.1.1.min.js" />
+    <Content Include="Scripts\lightbox.min.js" />
     <Content Include="Scripts\linq.min.js" />
     <Content Include="Scripts\promise-0.1.1.min.js" />
     <Content Include="Scripts\signals.min.js" />
     <Content Include="Scripts\underscore-min.js" />
     <Content Include="Scripts\vidyano.common.js" />
+    <Content Include="Scripts\vidyano.common.min.js">
+      <DependentUpon>vidyano.common.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\vidyano.cultures.js">
       <DependentUpon>vidyano.cultures.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.cultures.min.js">
+      <DependentUpon>vidyano.cultures.js</DependentUpon>
     </Content>
     <Content Include="Scripts\vidyano.js">
       <DependentUpon>vidyano.ts</DependentUpon>
     </Content>
+    <Content Include="Scripts\vidyano.min.js">
+      <DependentUpon>vidyano.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\vidyano.pages.js">
       <DependentUpon>vidyano.pages.ts</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.pages.min.js">
+      <DependentUpon>vidyano.pages.js</DependentUpon>
+    </Content>
+    <Content Include="Stylesheets\bootstrap.min.css" />
+    <Content Include="Stylesheets\lightbox.css" />
+    <Content Include="Stylesheets\lightbox.min.css">
+      <DependentUpon>lightbox.css</DependentUpon>
     </Content>
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -193,6 +218,18 @@
     </Content>
     <Content Include="Scripts\vidyano.pages.js.map">
       <DependentUpon>vidyano.pages.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.min.js.map">
+      <DependentUpon>vidyano.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.pages.min.js.map">
+      <DependentUpon>vidyano.pages.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.cultures.min.js.map">
+      <DependentUpon>vidyano.cultures.min.js</DependentUpon>
+    </Content>
+    <Content Include="Scripts\vidyano.common.min.js.map">
+      <DependentUpon>vidyano.common.min.js</DependentUpon>
     </Content>
     <None Include="Web.vidyano">
       <SubType>Designer</SubType>

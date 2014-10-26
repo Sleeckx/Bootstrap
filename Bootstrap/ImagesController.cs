@@ -1,6 +1,7 @@
 ﻿using Bootstrap.Service;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -8,16 +9,17 @@ using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using System.Web;
+using System.Web.Hosting;
 
 namespace Bootstrap
 {
-    public class ImagesController : ApiController
+    public class ImagesController : JSController
     {
-        public async Task<HttpResponseMessage> Get(string website, string name)
+        public async Task<HttpResponseMessage> Get(string key, string name)
         {
             using (var context = new BootstrapEntityModelContainer())
             {
-                var ws = context.Websites.FirstOrDefault(w => w.Name == website);
+                var ws = context.Websites.FirstOrDefault(w => w.Name == key);
                 if (ws != null)
                 {
                     var blob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(ws.Id) + name);
@@ -30,12 +32,12 @@ namespace Bootstrap
                         message.Content.Headers.ContentLength = blob.Properties.Length;
                         message.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(blob.Properties.ContentType);
 
-                        return message; 
+                        return message;
                     }
                 }
             }
 
-            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File not found"); 
+            return Request.CreateErrorResponse(HttpStatusCode.NotFound, "File not found");
         }
     }
 }

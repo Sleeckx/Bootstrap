@@ -16,22 +16,26 @@ namespace Bootstrap.Service
             return Manager.Current.GetUsers();
         }
 
-        public IEnumerable<object> WebsiteImages(CustomQueryArgs e)
+        private IEnumerable<object> ListImages(string prefix)
         {
-            var websiteId = Guid.Parse(e.Parent.ObjectId);
-            VerifyWebsiteAccess(websiteId);
-
-            var prefix = ImageActions.GetWebsitePrefix(websiteId);
             return ImageActions.WebsitesContainer.ListBlobs(prefix, false, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
                 .Select(blob =>
                 {
                     var name = blob.Name.Replace(prefix, "");
 
                     var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + name);
-                    var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(e.Parent.ObjectId, true) + name);
+                    var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + "thumbs/" + name);
 
                     return new { Id = fullBlob.Uri.ToString(), Name = name, QueryImage = thumbBlob.Uri.ToString() };
                 });
+        }
+
+        public IEnumerable<object> WebsiteImages(CustomQueryArgs e)
+        {
+            var websiteId = Guid.Parse(e.Parent.ObjectId);
+            VerifyWebsiteAccess(websiteId);
+
+            return ListImages(ImageActions.GetWebsitePrefix(websiteId));
         }
 
         public IEnumerable<object> ProductImages(CustomQueryArgs e)
@@ -39,17 +43,15 @@ namespace Bootstrap.Service
             var product = this.GetEntity<Product>(e.Parent);
             VerifyProductAccess(product.Id);
 
-            var prefix = ImageActions.GetProductPrefix(product.Website.Id, product.Id);
-            return ImageActions.WebsitesContainer.ListBlobs(prefix, false, Microsoft.WindowsAzure.Storage.Blob.BlobListingDetails.Metadata).OfType<CloudBlockBlob>()
-                .Select(blob =>
-                {
-                    var name = blob.Name.Replace(prefix, "");
+            return ListImages(ImageActions.GetProductPrefix(product.Website.Id, product.Id));
+        }
 
-                    var fullBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(prefix + name);
-                    var thumbBlob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetProductPrefix(product.Website.Id, product.Id, true) + name);
+        public IEnumerable<object> PageImages(CustomQueryArgs e)
+        {
+            var page = this.GetEntity<Page>(e.Parent);
+            VerifyPageAccess(page.Id);
 
-                    return new { Id = fullBlob.Uri.ToString(), Name = name, QueryImage = thumbBlob.Uri.ToString() };
-                });
+            return ListImages(ImageActions.GetPagePrefix(page.Website.Id, page.Id));
         }
 
         public void VerifyWebsiteAccess(Guid id)
@@ -80,6 +82,21 @@ namespace Bootstrap.Service
             }
 
             throw new InvalidOperationException("Product access is not allowed.");
+        }
+
+        public void VerifyPageAccess(Guid id)
+        {
+            if (Manager.Current.User.IsMemberOf("Administrators"))
+                return;
+
+            var page = this.Pages.FirstOrDefault(p => p.Id == id);
+            if (page != null)
+            {
+                if (page.Website.Users.Any(u => u.Id == Manager.Current.User.Id))
+                    return;
+            }
+
+            throw new InvalidOperationException("Page access is not allowed.");
         }
     }
 }
