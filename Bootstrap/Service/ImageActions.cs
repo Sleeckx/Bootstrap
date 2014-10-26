@@ -17,6 +17,14 @@ namespace Bootstrap.Service
     {
         private static CloudBlobContainer _WebsitesContainer;
 
+        public override void OnConstruct(Query query, PersistentObject parent)
+        {
+            base.OnConstruct(query, parent);
+
+            if (Manager.Current.User.IsMemberOf("WebsiteContentEditors") && parent.Type == "Website")
+                query.Actions = query.Actions.Where(a => a != "Delete").ToArray();
+        }
+
         protected override void SaveNew(PersistentObject obj)
         {
             if (CheckRules(obj))
@@ -55,6 +63,9 @@ namespace Bootstrap.Service
 
         public override void OnDelete(PersistentObject parent, IEnumerable<object> entities, Query query, QueryResultItem[] selectedItems)
         {
+            if (Manager.Current.User.IsMemberOf("WebsiteContentEditors") && parent.Type == "Website")
+                throw new InvalidOperationException("Not allowed.");
+
             string prefix;
             if (parent.Type == "Website")
             {
