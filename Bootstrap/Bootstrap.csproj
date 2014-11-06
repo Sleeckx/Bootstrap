@@ -80,8 +80,9 @@
     <Reference Include="Microsoft.WindowsAzure.Storage">
       <HintPath>..\packages\WindowsAzure.Storage.4.3.0\lib\net40\Microsoft.WindowsAzure.Storage.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="System" />
@@ -112,8 +113,9 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Vidyano.Service">
-      <HintPath>..\packages\Vidyano.Service.5.0.33901.3368\lib\net45\Vidyano.Service.dll</HintPath>
+    <Reference Include="Vidyano.Service, Version=5.0.35305.3417, Culture=neutral, PublicKeyToken=d51b97a7f46ba8b6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Vidyano.Service.5.0.35305.3417\lib\net45\Vidyano.Service.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -139,11 +141,10 @@
     </Compile>
     <Compile Include="Service\BootstrapQueries.cs" />
     <Compile Include="Service\BootstrapWeb.cs" />
+    <Compile Include="Service\DefaultPersistentObjectActions.cs" />
     <Compile Include="Service\ImageActions.cs" />
     <Compile Include="Service\ImageProcessor.cs" />
     <Compile Include="Service\PageActions.cs" />
-    <Compile Include="Service\ProductActions.cs" />
-    <Compile Include="Service\UserActions.cs" />
     <Compile Include="Service\WebsiteActions.cs" />
     <Compile Include="StringHtmlExtensions.cs" />
     <Content Include="Global.asax" />
@@ -296,6 +297,10 @@
     </PropertyGroup>
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.dll" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y
+xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.pdb" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
         Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">

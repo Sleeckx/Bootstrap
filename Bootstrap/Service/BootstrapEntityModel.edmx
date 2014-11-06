@@ -3,258 +3,50 @@
 <edmx:Runtime>
 <edmx:StorageModels>
 <Schema Namespace="BootstrapModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
-        <EntityType Name="Pages">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="255" Nullable="false" />
-          <Property Name="Content" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="WebsitePage_Page_Id" Type="uniqueidentifier" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Products">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Name" Type="nvarchar" MaxLength="250" Nullable="false" />
-          <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="Price" Type="decimal" Precision="8" Scale="2" />
-          <Property Name="IsNew" Type="bit" Nullable="false" />
-          <Property Name="WebsiteProduct_Product_Id" Type="uniqueidentifier" Nullable="false" />
-        </EntityType>
-        <EntityType Name="Users">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Website_Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Website_Id" Type="uniqueidentifier" Nullable="false" />
-        </EntityType>
         <EntityType Name="Websites">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
           <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="Title" Type="nvarchar" MaxLength="255" Nullable="false" />
+          <Property Name="Domain" Type="nvarchar" MaxLength="255" />
+          <Property Name="Email" Type="nvarchar" MaxLength="255" />
+          <Property Name="DynamicSchema_Id" Type="nvarchar" MaxLength="10" />
         </EntityType>
-        <EntityType Name="Settings">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="uniqueidentifier" Nullable="false" />
-          <Property Name="Key" Type="nvarchar(max)" Nullable="false" />
-          <Property Name="Value" Type="nvarchar(max)" />
-          <Property Name="IsSystem" Type="bit" Nullable="false" />
-        </EntityType>
-        <Association Name="FK_Users_Websites">
-          <End Role="Websites" Type="Self.Websites" Multiplicity="1" />
-          <End Role="Users" Type="Self.Users" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Websites">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Users">
-              <PropertyRef Name="Website_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_WebsitePage">
-          <End Role="Websites" Type="Self.Websites" Multiplicity="1" />
-          <End Role="Pages" Type="Self.Pages" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Websites">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Pages">
-              <PropertyRef Name="WebsitePage_Page_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_WebsiteProduct">
-          <End Role="Websites" Type="Self.Websites" Multiplicity="1" />
-          <End Role="Products" Type="Self.Products" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Websites">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="Products">
-              <PropertyRef Name="WebsiteProduct_Product_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
         <EntityContainer Name="BootstrapModelStoreContainer">
-          <EntitySet Name="Pages" EntityType="Self.Pages" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Products" EntityType="Self.Products" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Websites" EntityType="Self.Websites" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Settings" EntityType="Self.Settings" Schema="Vidyano" store:Type="Tables" />
-          <AssociationSet Name="FK_Users_Websites" Association="Self.FK_Users_Websites">
-            <End Role="Websites" EntitySet="Websites" />
-            <End Role="Users" EntitySet="Users" />
-          </AssociationSet>
-          <AssociationSet Name="FK_WebsitePage" Association="Self.FK_WebsitePage">
-            <End Role="Websites" EntitySet="Websites" />
-            <End Role="Pages" EntitySet="Pages" />
-          </AssociationSet>
-          <AssociationSet Name="FK_WebsiteProduct" Association="Self.FK_WebsiteProduct">
-            <End Role="Websites" EntitySet="Websites" />
-            <End Role="Products" EntitySet="Products" />
-          </AssociationSet>
         </EntityContainer>
       </Schema></edmx:StorageModels>
 <edmx:ConceptualModels>
 <Schema Namespace="BootstrapModel" Alias="Self" p1:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:p1="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
   <EntityContainer Name="BootstrapEntityModelContainer" p1:LazyLoadingEnabled="true" >
           <EntitySet Name="Websites" EntityType="BootstrapModel.Website" />
-          <EntitySet Name="Pages" EntityType="BootstrapModel.Page" />
-          <AssociationSet Name="FK_WebsitePage" Association="BootstrapModel.FK_WebsitePage">
-            <End Role="Website" EntitySet="Websites" />
-            <End Role="Page" EntitySet="Pages" />
-          </AssociationSet>
-          <EntitySet Name="Users" EntityType="BootstrapModel.User" />
-          <AssociationSet Name="FK_Users_Websites" Association="BootstrapModel.FK_Users_Websites">
-            <End Role="Website" EntitySet="Websites" />
-            <End Role="User" EntitySet="Users" />
-          </AssociationSet>
-          <EntitySet Name="Products" EntityType="BootstrapModel.Product" />
-          <AssociationSet Name="FK_WebsiteProduct" Association="BootstrapModel.FK_WebsiteProduct">
-            <End Role="Website" EntitySet="Websites" />
-            <End Role="Product" EntitySet="Products" />
-          </AssociationSet>
-          <EntitySet Name="Settings" EntityType="BootstrapModel.Setting" />
           </EntityContainer>
         <EntityType Name="Website">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" annotation:StoreGeneratedPattern="None" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" Unicode="true" FixedLength="false" />
-          <NavigationProperty Name="Pages" Relationship="BootstrapModel.FK_WebsitePage" FromRole="Website" ToRole="Page" />
-          <NavigationProperty Name="Users" Relationship="BootstrapModel.FK_Users_Websites" FromRole="Website" ToRole="User" />
-          <NavigationProperty Name="Products" Relationship="BootstrapModel.FK_WebsiteProduct" FromRole="Website" ToRole="Product" />
-        </EntityType>
-        <EntityType Name="Page">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
           <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="Content" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Website" Relationship="BootstrapModel.FK_WebsitePage" FromRole="Page" ToRole="Website" />
-        </EntityType>
-        <Association Name="FK_WebsitePage">
-          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
-          <End Type="BootstrapModel.Page" Role="Page" Multiplicity="*" />
-        </Association>
-        <EntityType Name="User">
-          <Key>
-            <PropertyRef Name="Id" />
-            <PropertyRef Name="Website_Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Website_Id" Type="Guid" Nullable="false" />
-          <NavigationProperty Name="Website" Relationship="BootstrapModel.FK_Users_Websites" FromRole="User" ToRole="Website" />
-        </EntityType>
-        <Association Name="FK_Users_Websites">
-          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
-          <End Type="BootstrapModel.User" Role="User" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Website">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="User">
-              <PropertyRef Name="Website_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="Product">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Name" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
-          <Property Name="Description" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Price" Type="Decimal" Precision="8" Scale="2" />
-          <Property Name="IsNew" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Website" Relationship="BootstrapModel.FK_WebsiteProduct" FromRole="Product" ToRole="Website" />
-        </EntityType>
-        <Association Name="FK_WebsiteProduct">
-          <End Type="BootstrapModel.Website" Role="Website" Multiplicity="1" />
-          <End Type="BootstrapModel.Product" Role="Product" Multiplicity="*" />
-        </Association>
-        <EntityType Name="Setting">
-          <Key>
-            <PropertyRef Name="Id" />
-          </Key>
-          <Property Name="Id" Type="Guid" Nullable="false" />
-          <Property Name="Key" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="Value" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="IsSystem" Type="Boolean" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="Title" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
+          <Property Name="DynamicSchema_Id" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="Domain" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
 </edmx:ConceptualModels>
 <edmx:Mappings>
 <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
   <EntityContainerMapping StorageEntityContainer="BootstrapModelStoreContainer" CdmEntityContainer="BootstrapEntityModelContainer">
-    <EntitySetMapping Name="Websites">
-      <EntityTypeMapping TypeName="IsTypeOf(BootstrapModel.Website)">
-        <MappingFragment StoreEntitySet="Websites">
-          <ScalarProperty Name="Id" ColumnName="Id" />
-          <ScalarProperty Name="Name" ColumnName="Name" />
-        </MappingFragment>
-      </EntityTypeMapping>
-    </EntitySetMapping>
-          <EntitySetMapping Name="Pages">
-            <EntityTypeMapping TypeName="BootstrapModel.Page">
-              <MappingFragment StoreEntitySet="Pages">
-                <ScalarProperty Name="Content" ColumnName="Content" />
+          <EntitySetMapping Name="Websites">
+            <EntityTypeMapping TypeName="BootstrapModel.Website">
+              <MappingFragment StoreEntitySet="Websites">
+                <ScalarProperty Name="Domain" ColumnName="Domain" />
+                <ScalarProperty Name="DynamicSchema_Id" ColumnName="DynamicSchema_Id" />
+                <ScalarProperty Name="Email" ColumnName="Email" />
+                <ScalarProperty Name="Title" ColumnName="Title" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <AssociationSetMapping Name="FK_WebsitePage" TypeName="BootstrapModel.FK_WebsitePage" StoreEntitySet="Pages">
-            <EndProperty Name="Page">
-              <ScalarProperty Name="Id" ColumnName="Id" />
-            </EndProperty>
-            <EndProperty Name="Website">
-              <ScalarProperty Name="Id" ColumnName="WebsitePage_Page_Id" />
-            </EndProperty>
-          </AssociationSetMapping>
-          <EntitySetMapping Name="Users">
-            <EntityTypeMapping TypeName="BootstrapModel.User">
-              <MappingFragment StoreEntitySet="Users">
-                <ScalarProperty Name="Website_Id" ColumnName="Website_Id" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Products">
-            <EntityTypeMapping TypeName="BootstrapModel.Product">
-              <MappingFragment StoreEntitySet="Products">
-                <ScalarProperty Name="IsNew" ColumnName="IsNew" />
-                <ScalarProperty Name="Price" ColumnName="Price" />
-                <ScalarProperty Name="Description" ColumnName="Description" />
-                <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="Id" ColumnName="Id" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <AssociationSetMapping Name="FK_WebsiteProduct" TypeName="BootstrapModel.FK_WebsiteProduct" StoreEntitySet="Products">
-            <EndProperty Name="Product">
-              <ScalarProperty Name="Id" ColumnName="Id" />
-            </EndProperty>
-            <EndProperty Name="Website">
-              <ScalarProperty Name="Id" ColumnName="WebsiteProduct_Product_Id" />
-            </EndProperty>
-          </AssociationSetMapping>
-          <EntitySetMapping Name="Settings">
-            <EntityTypeMapping TypeName="BootstrapModel.Setting">
-              <MappingFragment StoreEntitySet="Settings">
-                <ScalarProperty Name="IsSystem" ColumnName="IsSystem" />
-                <ScalarProperty Name="Value" ColumnName="Value" />
-                <ScalarProperty Name="Key" ColumnName="Key" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
@@ -280,14 +72,7 @@
     <!-- Diagram content (shape and connector positions) -->
     <Diagrams>
       <Diagram DiagramId="6d2254d4485940e39315e398170d5a39" Name="Diagram1" >
-        <EntityTypeShape EntityType="BootstrapModel.Website" Width="1.5" PointX="3.625" PointY="1.75" />
-        <EntityTypeShape EntityType="BootstrapModel.Page" Width="1.5" PointX="6.375" PointY="1.125" />
-        <AssociationConnector Association="BootstrapModel.FK_WebsitePage" />
-        <EntityTypeShape EntityType="BootstrapModel.User" Width="1.5" PointX="1.25" PointY="1.875" />
-        <AssociationConnector Association="BootstrapModel.FK_Users_Websites" />
-        <EntityTypeShape EntityType="BootstrapModel.Product" Width="1.5" PointX="6.375" PointY="3.25" />
-        <AssociationConnector Association="BootstrapModel.FK_WebsiteProduct" />
-        <EntityTypeShape EntityType="BootstrapModel.Setting" Width="1.5" PointX="0.75" PointY="4.75" />
+        <EntityTypeShape EntityType="BootstrapModel.Website" Width="1.875" PointX="3.75" PointY="1.75" />
         </Diagram>
     </Diagrams>
   </Designer>

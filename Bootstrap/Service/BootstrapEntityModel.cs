@@ -17,14 +17,6 @@ using System.Runtime.Serialization;
 using System.Xml.Serialization;
 
 [assembly: EdmSchemaAttribute()]
-#region EDM Relationship Metadata
-
-[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_WebsitePage", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Page", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Page))]
-[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_Users_Websites", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "User", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.User), true)]
-[assembly: EdmRelationshipAttribute("BootstrapModel", "FK_WebsiteProduct", "Website", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.One, typeof(Bootstrap.Service.Website), "Product", System.Data.Entity.Core.Metadata.Edm.RelationshipMultiplicity.Many, typeof(Bootstrap.Service.Product))]
-
-#endregion
-
 namespace Bootstrap.Service
 {
     #region Contexts
@@ -88,70 +80,6 @@ namespace Bootstrap.Service
             }
         }
         private ObjectSet<Website> _Websites;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<Page> Pages
-        {
-            get
-            {
-                if ((_Pages == null))
-                {
-                    _Pages = base.CreateObjectSet<Page>("Pages");
-                }
-                return _Pages;
-            }
-        }
-        private ObjectSet<Page> _Pages;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<User> Users
-        {
-            get
-            {
-                if ((_Users == null))
-                {
-                    _Users = base.CreateObjectSet<User>("Users");
-                }
-                return _Users;
-            }
-        }
-        private ObjectSet<User> _Users;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<Product> Products
-        {
-            get
-            {
-                if ((_Products == null))
-                {
-                    _Products = base.CreateObjectSet<Product>("Products");
-                }
-                return _Products;
-            }
-        }
-        private ObjectSet<Product> _Products;
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        public ObjectSet<Setting> Settings
-        {
-            get
-            {
-                if ((_Settings == null))
-                {
-                    _Settings = base.CreateObjectSet<Setting>("Settings");
-                }
-                return _Settings;
-            }
-        }
-        private ObjectSet<Setting> _Settings;
 
         #endregion
 
@@ -164,38 +92,6 @@ namespace Bootstrap.Service
         {
             base.AddObject("Websites", website);
         }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Pages EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToPages(Page page)
-        {
-            base.AddObject("Pages", page);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Users EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToUsers(User user)
-        {
-            base.AddObject("Users", user);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Products EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToProducts(Product product)
-        {
-            base.AddObject("Products", product);
-        }
-    
-        /// <summary>
-        /// Deprecated Method for adding a new object to the Settings EntitySet. Consider using the .Add method of the associated ObjectSet&lt;T&gt; property instead.
-        /// </summary>
-        public void AddToSettings(Setting setting)
-        {
-            base.AddObject("Settings", setting);
-        }
 
         #endregion
 
@@ -204,615 +100,6 @@ namespace Bootstrap.Service
     #endregion
 
     #region Entities
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="Page")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class Page : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new Page object.
-        /// </summary>
-        /// <param name="id">Initial value of the Id property.</param>
-        /// <param name="name">Initial value of the Name property.</param>
-        /// <param name="content">Initial value of the Content property.</param>
-        public static Page CreatePage(global::System.Guid id, global::System.String name, global::System.String content)
-        {
-            Page page = new Page();
-            page.Id = id;
-            page.Name = name;
-            page.Content = content;
-            return page;
-        }
-
-        #endregion
-
-        #region Simple Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Id
-        {
-            get
-            {
-                return _Id;
-            }
-            set
-            {
-                if (_Id != value)
-                {
-                    OnIdChanging(value);
-                    ReportPropertyChanging("Id");
-                    _Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Id");
-                    OnIdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Id;
-        partial void OnIdChanging(global::System.Guid value);
-        partial void OnIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Name
-        {
-            get
-            {
-                return _Name;
-            }
-            set
-            {
-                OnNameChanging(value);
-                ReportPropertyChanging("Name");
-                _Name = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Name");
-                OnNameChanged();
-            }
-        }
-        private global::System.String _Name;
-        partial void OnNameChanging(global::System.String value);
-        partial void OnNameChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Content
-        {
-            get
-            {
-                return _Content;
-            }
-            set
-            {
-                OnContentChanging(value);
-                ReportPropertyChanging("Content");
-                _Content = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Content");
-                OnContentChanged();
-            }
-        }
-        private global::System.String _Content;
-        partial void OnContentChanging(global::System.String value);
-        partial void OnContentChanged();
-
-        #endregion
-
-        #region Navigation Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsitePage", "Website")]
-        public Website Website
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<Website> WebsiteReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_WebsitePage", "Website", value);
-                }
-            }
-        }
-
-        #endregion
-
-    }
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="Product")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class Product : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new Product object.
-        /// </summary>
-        /// <param name="id">Initial value of the Id property.</param>
-        /// <param name="name">Initial value of the Name property.</param>
-        /// <param name="description">Initial value of the Description property.</param>
-        /// <param name="isNew">Initial value of the IsNew property.</param>
-        public static Product CreateProduct(global::System.Guid id, global::System.String name, global::System.String description, global::System.Boolean isNew)
-        {
-            Product product = new Product();
-            product.Id = id;
-            product.Name = name;
-            product.Description = description;
-            product.IsNew = isNew;
-            return product;
-        }
-
-        #endregion
-
-        #region Simple Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Id
-        {
-            get
-            {
-                return _Id;
-            }
-            set
-            {
-                if (_Id != value)
-                {
-                    OnIdChanging(value);
-                    ReportPropertyChanging("Id");
-                    _Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Id");
-                    OnIdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Id;
-        partial void OnIdChanging(global::System.Guid value);
-        partial void OnIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Name
-        {
-            get
-            {
-                return _Name;
-            }
-            set
-            {
-                OnNameChanging(value);
-                ReportPropertyChanging("Name");
-                _Name = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Name");
-                OnNameChanged();
-            }
-        }
-        private global::System.String _Name;
-        partial void OnNameChanging(global::System.String value);
-        partial void OnNameChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Description
-        {
-            get
-            {
-                return _Description;
-            }
-            set
-            {
-                OnDescriptionChanging(value);
-                ReportPropertyChanging("Description");
-                _Description = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Description");
-                OnDescriptionChanged();
-            }
-        }
-        private global::System.String _Description;
-        partial void OnDescriptionChanging(global::System.String value);
-        partial void OnDescriptionChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public Nullable<global::System.Decimal> Price
-        {
-            get
-            {
-                return _Price;
-            }
-            set
-            {
-                OnPriceChanging(value);
-                ReportPropertyChanging("Price");
-                _Price = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("Price");
-                OnPriceChanged();
-            }
-        }
-        private Nullable<global::System.Decimal> _Price;
-        partial void OnPriceChanging(Nullable<global::System.Decimal> value);
-        partial void OnPriceChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Boolean IsNew
-        {
-            get
-            {
-                return _IsNew;
-            }
-            set
-            {
-                OnIsNewChanging(value);
-                ReportPropertyChanging("IsNew");
-                _IsNew = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("IsNew");
-                OnIsNewChanged();
-            }
-        }
-        private global::System.Boolean _IsNew;
-        partial void OnIsNewChanging(global::System.Boolean value);
-        partial void OnIsNewChanged();
-
-        #endregion
-
-        #region Navigation Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsiteProduct", "Website")]
-        public Website Website
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<Website> WebsiteReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_WebsiteProduct", "Website", value);
-                }
-            }
-        }
-
-        #endregion
-
-    }
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="Setting")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class Setting : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new Setting object.
-        /// </summary>
-        /// <param name="id">Initial value of the Id property.</param>
-        /// <param name="key">Initial value of the Key property.</param>
-        /// <param name="isSystem">Initial value of the IsSystem property.</param>
-        public static Setting CreateSetting(global::System.Guid id, global::System.String key, global::System.Boolean isSystem)
-        {
-            Setting setting = new Setting();
-            setting.Id = id;
-            setting.Key = key;
-            setting.IsSystem = isSystem;
-            return setting;
-        }
-
-        #endregion
-
-        #region Simple Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Id
-        {
-            get
-            {
-                return _Id;
-            }
-            set
-            {
-                if (_Id != value)
-                {
-                    OnIdChanging(value);
-                    ReportPropertyChanging("Id");
-                    _Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Id");
-                    OnIdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Id;
-        partial void OnIdChanging(global::System.Guid value);
-        partial void OnIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.String Key
-        {
-            get
-            {
-                return _Key;
-            }
-            set
-            {
-                OnKeyChanging(value);
-                ReportPropertyChanging("Key");
-                _Key = StructuralObject.SetValidValue(value, false);
-                ReportPropertyChanged("Key");
-                OnKeyChanged();
-            }
-        }
-        private global::System.String _Key;
-        partial void OnKeyChanging(global::System.String value);
-        partial void OnKeyChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
-        [DataMemberAttribute()]
-        public global::System.String Value
-        {
-            get
-            {
-                return _Value;
-            }
-            set
-            {
-                OnValueChanging(value);
-                ReportPropertyChanging("Value");
-                _Value = StructuralObject.SetValidValue(value, true);
-                ReportPropertyChanged("Value");
-                OnValueChanged();
-            }
-        }
-        private global::System.String _Value;
-        partial void OnValueChanging(global::System.String value);
-        partial void OnValueChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Boolean IsSystem
-        {
-            get
-            {
-                return _IsSystem;
-            }
-            set
-            {
-                OnIsSystemChanging(value);
-                ReportPropertyChanging("IsSystem");
-                _IsSystem = StructuralObject.SetValidValue(value);
-                ReportPropertyChanged("IsSystem");
-                OnIsSystemChanged();
-            }
-        }
-        private global::System.Boolean _IsSystem;
-        partial void OnIsSystemChanging(global::System.Boolean value);
-        partial void OnIsSystemChanged();
-
-        #endregion
-
-    }
-    
-    /// <summary>
-    /// No Metadata Documentation available.
-    /// </summary>
-    [EdmEntityTypeAttribute(NamespaceName="BootstrapModel", Name="User")]
-    [Serializable()]
-    [DataContractAttribute(IsReference=true)]
-    public partial class User : EntityObject
-    {
-        #region Factory Method
-    
-        /// <summary>
-        /// Create a new User object.
-        /// </summary>
-        /// <param name="id">Initial value of the Id property.</param>
-        /// <param name="website_Id">Initial value of the Website_Id property.</param>
-        public static User CreateUser(global::System.Guid id, global::System.Guid website_Id)
-        {
-            User user = new User();
-            user.Id = id;
-            user.Website_Id = website_Id;
-            return user;
-        }
-
-        #endregion
-
-        #region Simple Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Id
-        {
-            get
-            {
-                return _Id;
-            }
-            set
-            {
-                if (_Id != value)
-                {
-                    OnIdChanging(value);
-                    ReportPropertyChanging("Id");
-                    _Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Id");
-                    OnIdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Id;
-        partial void OnIdChanging(global::System.Guid value);
-        partial void OnIdChanged();
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [EdmScalarPropertyAttribute(EntityKeyProperty=true, IsNullable=false)]
-        [DataMemberAttribute()]
-        public global::System.Guid Website_Id
-        {
-            get
-            {
-                return _Website_Id;
-            }
-            set
-            {
-                if (_Website_Id != value)
-                {
-                    OnWebsite_IdChanging(value);
-                    ReportPropertyChanging("Website_Id");
-                    _Website_Id = StructuralObject.SetValidValue(value);
-                    ReportPropertyChanged("Website_Id");
-                    OnWebsite_IdChanged();
-                }
-            }
-        }
-        private global::System.Guid _Website_Id;
-        partial void OnWebsite_IdChanging(global::System.Guid value);
-        partial void OnWebsite_IdChanged();
-
-        #endregion
-
-        #region Navigation Properties
-    
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
-        [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_Users_Websites", "Website")]
-        public Website Website
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website").Value;
-            }
-            set
-            {
-                ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website").Value = value;
-            }
-        }
-        /// <summary>
-        /// No Metadata Documentation available.
-        /// </summary>
-        [BrowsableAttribute(false)]
-        [DataMemberAttribute()]
-        public EntityReference<Website> WebsiteReference
-        {
-            get
-            {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website");
-            }
-            set
-            {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedReference<Website>("BootstrapModel.FK_Users_Websites", "Website", value);
-                }
-            }
-        }
-
-        #endregion
-
-    }
     
     /// <summary>
     /// No Metadata Documentation available.
@@ -829,11 +116,13 @@ namespace Bootstrap.Service
         /// </summary>
         /// <param name="id">Initial value of the Id property.</param>
         /// <param name="name">Initial value of the Name property.</param>
-        public static Website CreateWebsite(global::System.Guid id, global::System.String name)
+        /// <param name="title">Initial value of the Title property.</param>
+        public static Website CreateWebsite(global::System.Guid id, global::System.String name, global::System.String title)
         {
             Website website = new Website();
             website.Id = id;
             website.Name = name;
+            website.Title = title;
             return website;
         }
 
@@ -891,76 +180,102 @@ namespace Bootstrap.Service
         private global::System.String _Name;
         partial void OnNameChanging(global::System.String value);
         partial void OnNameChanged();
-
-        #endregion
-
-        #region Navigation Properties
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=false)]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsitePage", "Page")]
-        public EntityCollection<Page> Pages
+        public global::System.String Title
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Page>("BootstrapModel.FK_WebsitePage", "Page");
+                return _Title;
             }
             set
             {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Page>("BootstrapModel.FK_WebsitePage", "Page", value);
-                }
+                OnTitleChanging(value);
+                ReportPropertyChanging("Title");
+                _Title = StructuralObject.SetValidValue(value, false);
+                ReportPropertyChanged("Title");
+                OnTitleChanged();
             }
         }
+        private global::System.String _Title;
+        partial void OnTitleChanging(global::System.String value);
+        partial void OnTitleChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_Users_Websites", "User")]
-        public EntityCollection<User> Users
+        public global::System.String Email
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<User>("BootstrapModel.FK_Users_Websites", "User");
+                return _Email;
             }
             set
             {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<User>("BootstrapModel.FK_Users_Websites", "User", value);
-                }
+                OnEmailChanging(value);
+                ReportPropertyChanging("Email");
+                _Email = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("Email");
+                OnEmailChanged();
             }
         }
+        private global::System.String _Email;
+        partial void OnEmailChanging(global::System.String value);
+        partial void OnEmailChanged();
     
         /// <summary>
         /// No Metadata Documentation available.
         /// </summary>
-        [XmlIgnoreAttribute()]
-        [SoapIgnoreAttribute()]
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
         [DataMemberAttribute()]
-        [EdmRelationshipNavigationPropertyAttribute("BootstrapModel", "FK_WebsiteProduct", "Product")]
-        public EntityCollection<Product> Products
+        public global::System.String DynamicSchema_Id
         {
             get
             {
-                return ((IEntityWithRelationships)this).RelationshipManager.GetRelatedCollection<Product>("BootstrapModel.FK_WebsiteProduct", "Product");
+                return _DynamicSchema_Id;
             }
             set
             {
-                if ((value != null))
-                {
-                    ((IEntityWithRelationships)this).RelationshipManager.InitializeRelatedCollection<Product>("BootstrapModel.FK_WebsiteProduct", "Product", value);
-                }
+                OnDynamicSchema_IdChanging(value);
+                ReportPropertyChanging("DynamicSchema_Id");
+                _DynamicSchema_Id = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("DynamicSchema_Id");
+                OnDynamicSchema_IdChanged();
             }
         }
+        private global::System.String _DynamicSchema_Id;
+        partial void OnDynamicSchema_IdChanging(global::System.String value);
+        partial void OnDynamicSchema_IdChanged();
+    
+        /// <summary>
+        /// No Metadata Documentation available.
+        /// </summary>
+        [EdmScalarPropertyAttribute(EntityKeyProperty=false, IsNullable=true)]
+        [DataMemberAttribute()]
+        public global::System.String Domain
+        {
+            get
+            {
+                return _Domain;
+            }
+            set
+            {
+                OnDomainChanging(value);
+                ReportPropertyChanging("Domain");
+                _Domain = StructuralObject.SetValidValue(value, true);
+                ReportPropertyChanged("Domain");
+                OnDomainChanged();
+            }
+        }
+        private global::System.String _Domain;
+        partial void OnDomainChanging(global::System.String value);
+        partial void OnDomainChanged();
 
         #endregion
 

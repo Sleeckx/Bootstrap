@@ -29,16 +29,18 @@
     class Index {
         private _serviceUri;
         private _serviceHooks;
+        private _website;
         private _isLoading;
         private _currentPage;
         public service: Service;
         public pageTarget: JQuery;
         public errorTarget: JQuery;
-        constructor(_serviceUri?: string, _serviceHooks?: ServiceHooks);
+        constructor(_serviceUri?: string, _serviceHooks?: ServiceHooks, _website?: string);
         public isLoading : boolean;
+        public website : string;
         public currentPage : Page;
         public addPage(createPage: any, route?: string): void;
-        public initialize(skipDefaultLogin?: boolean): Promise<any>;
+        public initialize(): Promise<any>;
         public executeError(err: any, work: () => Promise<any>, userCanRetry?: boolean): void;
         public execute(work: () => Promise<any>, userCanRetry?: boolean): Promise<any>;
         public start(): Promise<any>;

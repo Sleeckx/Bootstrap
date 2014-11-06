@@ -9,6 +9,7 @@ using System.Text;
 using Vidyano.Core.Extensions;
 using Vidyano.Service;
 using Vidyano.Service.Charts;
+using Vidyano.Service.Dynamic;
 using Vidyano.Service.Repository;
 
 namespace Bootstrap.Service
@@ -29,33 +30,16 @@ namespace Bootstrap.Service
         {
             if (CheckRules(obj))
             {
-                string prefix;
-                if (obj.Parent.Type == "Website")
-                {
-                    var websiteId = Guid.Parse(obj.Parent.ObjectId);
-                    Context.VerifyWebsiteAccess(websiteId);
+                var website = WebsiteActions.GetWebsite(obj.Parent);
+                if (website == null)
+                    throw new InvalidOperationException("Parent website not found.");
 
-                    prefix = GetWebsitePrefix(websiteId);
-                }
-                else if (obj.Parent.Type == "Product")
-                {
-                    var product = Context.GetEntity<Product>(obj.Parent);
-                    Context.VerifyProductAccess(product.Id);
+                var isDynamic = !obj.Parent.FullTypeName.StartsWith("Bootstrap.");
+                var collectionName = isDynamic ? obj.Parent.Type : null;
+                var collectionEntityId = isDynamic ? obj.Parent.ObjectId : null;
 
-                    prefix = GetProductPrefix(product.Website.Id, product.Id);
-                }
-                else if (obj.Parent.Type == "Page")
-                {
-                    var page = Context.GetEntity<Page>(obj.Parent);
-                    Context.VerifyPageAccess(page.Id);
-
-                    prefix = GetPagePrefix(page.Website.Id, page.Id);
-                }
-                else
-                    throw new InvalidOperationException("Invalid parent type.");
-
-                UploadImage(prefix + (string)obj.GetAttributeValue("Name"), (byte[])obj.GetAttributeValue("UploadImage"));
-                UploadImage(prefix + "thumbs/" + (string)obj.GetAttributeValue("Name"), ImageProcessor.ResizeImage((byte[])obj.GetAttributeValue("UploadImage"), 200));
+                UploadImage(GetContainerPrefix(website, collectionName, collectionEntityId) + (string)obj.GetAttributeValue("Name"), (byte[])obj.GetAttributeValue("UploadImage"));
+                UploadImage(GetContainerPrefix(website, collectionName, collectionEntityId, true) + (string)obj.GetAttributeValue("Name"), ImageProcessor.ResizeImage((byte[])obj.GetAttributeValue("UploadImage"), 200));
             }
             else
                 base.SaveNew(obj);
@@ -63,44 +47,24 @@ namespace Bootstrap.Service
 
         public override void OnDelete(PersistentObject parent, IEnumerable<object> entities, Query query, QueryResultItem[] selectedItems)
         {
-            if (Manager.Current.User.IsMemberOf("WebsiteContentEditors") && parent.Type == "Website")
-                throw new InvalidOperationException("Not allowed.");
+            var website = WebsiteActions.GetWebsite(parent);
+            if (website == null)
+                throw new InvalidOperationException("Parent website not found.");
 
-            string prefix;
-            if (parent.Type == "Website")
-            {
-                var websiteId = Guid.Parse(parent.ObjectId);
-                Context.VerifyWebsiteAccess(websiteId);
-
-                prefix = GetWebsitePrefix(websiteId);
-            }
-            else if (parent.Type == "Product")
-            {
-                var product = Context.GetEntity<Product>(parent);
-                Context.VerifyProductAccess(product.Id);
-
-                prefix = GetProductPrefix(product.Website.Id, product.Id);
-            }
-            else if (parent.Type == "Page")
-            {
-                var page = Context.GetEntity<Page>(parent);
-                Context.VerifyPageAccess(page.Id);
-
-                prefix = GetPagePrefix(page.Website.Id, page.Id);
-            }
-            else
-                throw new InvalidOperationException("Invalid parent type.");
+            var isDynamic = !parent.FullTypeName.StartsWith("Bootstrap.");
+            var collectionName = isDynamic ? parent.Type : null;
+            var collectionEntityId = isDynamic ? parent.ObjectId : null;
 
             selectedItems.Run(item =>
             {
-                DeleteImage(prefix + item.Id);
-                DeleteImage(prefix + "thumbs/" + item.Id);
+                ImagesContainer.GetBlockBlobReference(GetContainerPrefix(website, collectionName, collectionEntityId) + item.GetValue("Name")).DeleteIfExists();
+                ImagesContainer.GetBlockBlobReference(GetContainerPrefix(website, collectionName, collectionEntityId, true) + item.GetValue("Name")).DeleteIfExists();
             });
         }
 
         private void UploadImage(string name, byte[] image)
         {
-            var blob = WebsitesContainer.GetBlockBlobReference(name);
+            var blob = ImagesContainer.GetBlockBlobReference(name);
             blob.UploadFromByteArray(image, 0, image.Length);
 
             var extension = Path.GetExtension(blob.Uri.AbsoluteUri);
@@ -125,60 +89,30 @@ namespace Bootstrap.Service
             blob.SetProperties();
         }
 
-        private void DeleteImage(string name)
-        {
-            WebsitesContainer.GetBlockBlobReference(name).DeleteIfExists();
-        }
-
-        internal static CloudBlobContainer WebsitesContainer
+        internal static CloudBlobContainer ImagesContainer
         {
             get
             {
                 if (_WebsitesContainer != null)
                     return _WebsitesContainer;
 
-                var storageConnectionString = Manager.Current != null ? Manager.Current.GetSetting("StorageConnectionString") : null;
-                if (storageConnectionString == null)
-                {
-                    using (var context = new BootstrapEntityModelContainer())
-                        storageConnectionString = context.Settings.First(s => s.Key == "StorageConnectionString").Value;
-                }
+                string storageConnectionString;
+                using (Manager.Current == null ? Manager.CreateForUser("admin") : null)
+                    storageConnectionString = Manager.Current.GetSetting("StorageConnectionString");
 
                 var storageAccount = CloudStorageAccount.Parse(storageConnectionString);
                 var blobClient = storageAccount.CreateCloudBlobClient();
 
-                return _WebsitesContainer = blobClient.GetContainerReference("websites");
+                return _WebsitesContainer = blobClient.GetContainerReference("images");
             }
         }
 
-        internal static string GetWebsitePrefix(string id)
+        internal static string GetContainerPrefix(Website website, string collection = null, string collectionEntityId = null, bool thumbs = false)
         {
-            return id + "/";
-        }
-
-        internal static string GetWebsitePrefix(Guid id)
-        {
-            return GetWebsitePrefix(id.ToString());
-        }
-
-        internal static string GetProductPrefix(string websiteId, string productId)
-        {
-            return websiteId + "/products/" + productId + "/";
-        }
-
-        internal static string GetProductPrefix(Guid websiteId, Guid productId)
-        {
-            return GetProductPrefix(websiteId.ToString(), productId.ToString());
-        }
-
-        internal static string GetPagePrefix(string websiteId, string pageId)
-        {
-            return websiteId + "/pages/" + pageId + "/";
-        }
-
-        internal static string GetPagePrefix(Guid websiteId, Guid pageId)
-        {
-            return GetPagePrefix(websiteId.ToString(), pageId.ToString());
+            return website.Id.ToString().ToLower() + "/" +
+                   (collection != null ? collection.ToLower() + "/" : null) +
+                   (collectionEntityId != null ? collectionEntityId.ToLower() + "/" : null) +
+                   (thumbs ? "thumbs/" : null);
         }
     }
 }

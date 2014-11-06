@@ -19,10 +19,10 @@ namespace Bootstrap
         {
             using (var context = new BootstrapEntityModelContainer())
             {
-                var ws = context.Websites.FirstOrDefault(w => w.Name == key);
-                if (ws != null)
+                var website = context.Websites.FirstOrDefault(w => w.Name == key);
+                if (website != null)
                 {
-                    var blob = ImageActions.WebsitesContainer.GetBlockBlobReference(ImageActions.GetWebsitePrefix(ws.Id) + name);
+                    var blob = ImageActions.ImagesContainer.GetBlockBlobReference(ImageActions.GetContainerPrefix(website) + name);
                     if (await blob.ExistsAsync())
                     {
                         HttpResponseMessage message = new HttpResponseMessage(HttpStatusCode.OK);

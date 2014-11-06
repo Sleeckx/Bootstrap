@@ -14,14 +14,6 @@ var BootstrapClient;
             this.addPage(Test, "");
             this.start();
         }
-        Index.prototype.initialize = function () {
-            var _this = this;
-            return _super.prototype.initialize.call(this, true).then(function () {
-                return !_this.service.isSignedIn ? _this.service.signInUsingCredentials("test", "test") : Promise.resolve(true);
-            }).then(function () {
-                return $(document.body).removeClass("initializing");
-            });
-        };
         return Index;
     })(Vidyano.Pages.Index);
     BootstrapClient.Index = Index;
@@ -29,7 +21,7 @@ var BootstrapClient;
     var Test = (function (_super) {
         __extends(Test, _super);
         function Test(index, args) {
-            _super.call(this, index, "Test.Test");
+            _super.call(this, index, "Test");
         }
         return Test;
     })(Vidyano.Pages.ContentPage);

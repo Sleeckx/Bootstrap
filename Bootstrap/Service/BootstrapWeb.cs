@@ -33,5 +33,21 @@ namespace Bootstrap.Service
             // NOTE: Can be used to append extra custom style sheets (inline or embedded resources)
             //AppendEmbeddedResource(styleSheets, "BootstrapWeb.css");
         }
+
+        public override string DefaultUser
+        {
+            get
+            {
+                using (var context = new BootstrapEntityModelContainer())
+                {
+                    var domain = HttpContext.Request.UrlReferrer.Authority.ToString();
+                    var website = context.Websites.FirstOrDefault(ws => ws.Domain == domain);
+                    if (website == null)
+                        return null;
+
+                    return website.DynamicSchema_Id;
+                }
+            }
+        }
     }
 }

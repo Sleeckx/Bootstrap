@@ -1,30 +1,91 @@
+using Microsoft.CSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using Vidyano.Core.Extensions;
 using Vidyano.Service;
 using Vidyano.Service.Charts;
+using Vidyano.Service.Dynamic;
 using Vidyano.Service.Repository;
 
 namespace Bootstrap.Service
 {
     public class WebsiteActions : PersistentObjectActions<BootstrapEntityModelContainer, Website>
     {
-        public override void OnConstruct(PersistentObject obj)
-        {
-            base.OnConstruct(obj);
+        private static readonly CSharpCodeProvider provider = new CSharpCodeProvider();
 
-            obj.Queries.Run(query => query.IsCountIncludedInParentObject = true);
+        public override void OnLoad(PersistentObject obj, PersistentObject parent)
+        {
+            base.OnLoad(obj, parent);
+
+            var schema = Manager.Current.Dynamic.GetOrCreateSchema((string)obj["DynamicSchema_Id"]);
+            if (schema != null)
+            {
+                schema.Collections.Run(coll => obj.Queries.Add(coll.ToQuery()));
+                schema.ConfigureOn(obj, true, true, false);
+            }
+
+            obj.Queries.Run(q => q.IsIncludedInParentObject = true);
         }
 
-        protected override Source<Website> Where(Source<Website> source, Query query)
+        public override void OnSave(PersistentObject obj)
         {
-            if (Manager.Current.User.IsMemberOf("Administrators"))
-                return base.Where(source, query);
+            if (obj.IsNew)
+            {
+                var name = (string)obj.GetAttributeValue("Name");
+                if (!string.IsNullOrWhiteSpace(name))
+                    obj["DynamicSchema_Id"] = ValidIdentifier(name);
+            }
 
-            var userId = Manager.Current.User.Id;
-            return base.Where(source, query).Where(ws => ws.Users.Any(u => u.Id == userId));
+            base.OnSave(obj);
+
+            if (!obj.HasError && obj.IsNew)
+            {
+                var schema = Manager.Current.Dynamic.GetOrCreateSchema((string)obj["DynamicSchema_Id"]);
+                var pages = schema.GetOrCreateCollection("Page", "Pages", true, false);
+                pages.GetOrCreateProperty("Name", "Name", "Text", 10);
+                pages.GetOrCreateProperty("Content", "Content", "CommonMark", 20);
+
+                Manager.Current.GetUserOrGroup(schema.Name).AddToGroup("Users");
+            }
+        }
+
+        public override void OnDelete(PersistentObject parent, IEnumerable<Website> entities, Query query, QueryResultItem[] selectedItems)
+        {
+            entities.Run(e => Manager.Current.Dynamic.DeleteSchema(e.DynamicSchema_Id));
+            base.OnDelete(parent, entities, query, selectedItems);
+        }
+
+        private static string ValidIdentifier(string identifier, bool isProperty = false)
+        {
+            if (!provider.IsValidIdentifier(identifier))
+            {
+                identifier = provider.CreateValidIdentifier(Regex.Replace(identifier, @"[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Nl}\p{Mn}\p{Mc}\p{Cf}\p{Pc}\p{Lm}]", "_"));
+                if (char.IsDigit(identifier[0]))
+                    identifier = "_" + identifier;
+            }
+
+            if (isProperty && identifier[0] == '_')
+                identifier = "m" + identifier;
+
+            return identifier;
+        }
+
+        internal static Website GetWebsite(PersistentObject obj)
+        {
+            if(obj == null)
+                return null;
+
+            using (var context = new BootstrapEntityModelContainer())
+            {
+                if (obj.FullTypeName == "Bootstrap.Website")
+                    return context.GetEntity<Website>(obj);
+
+                var schemaName = obj.FullTypeName.Split('.')[0];
+                return context.Websites.FirstOrDefault(website => website.DynamicSchema_Id == schemaName);
+            }
         }
     }
 }

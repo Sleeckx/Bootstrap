@@ -52,7 +52,7 @@ var Vidyano;
                 }).map(function (template) {
                     return template._ready;
                 });
-                var contentLoader = this.service.getPersistentObject(null, "Bootstrap.Page", this.name).then(function (page) {
+                var contentLoader = this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(function (page) {
                     _this.content = page.getAttributeValue("Content");
                 });
                 return Promise.all(templateLoaders.concat([contentLoader]));
@@ -111,14 +111,18 @@ var Vidyano;
         Pages.Template = Template;
 
         var Index = (function () {
-            function Index(_serviceUri, _serviceHooks) {
+            function Index(_serviceUri, _serviceHooks, _website) {
                 if (typeof _serviceUri === "undefined") { _serviceUri = "https://bootstrap.2sky.be"; }
                 if (typeof _serviceHooks === "undefined") { _serviceHooks = new IndexServiceHooks(); }
+                if (typeof _website === "undefined") { _website = null; }
                 this._serviceUri = _serviceUri;
                 this._serviceHooks = _serviceHooks;
+                this._website = _website;
                 this._isLoading = false;
                 this.errorTarget = $("#error");
                 this.pageTarget = $("#target");
+
+                hasher.prependHash = "!/";
             }
             Object.defineProperty(Index.prototype, "isLoading", {
                 get: function () {
@@ -131,6 +135,14 @@ var Vidyano;
                 configurable: true
             });
 
+
+            Object.defineProperty(Index.prototype, "website", {
+                get: function () {
+                    return this._website || this.service.userName;
+                },
+                enumerable: true,
+                configurable: true
+            });
 
             Object.defineProperty(Index.prototype, "currentPage", {
                 get: function () {
@@ -155,11 +167,12 @@ var Vidyano;
                 });
             };
 
-            Index.prototype.initialize = function (skipDefaultLogin) {
+            Index.prototype.initialize = function () {
                 var _this = this;
-                if (typeof skipDefaultLogin === "undefined") { skipDefaultLogin = false; }
                 return this.execute(function () {
-                    return _this.service.initialize(skipDefaultLogin);
+                    return _this.service.initialize().then(function () {
+                        return $(document.body).removeClass("initializing");
+                    });
                 });
             };
 

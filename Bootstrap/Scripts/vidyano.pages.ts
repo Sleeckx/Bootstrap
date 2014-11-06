@@ -27,7 +27,7 @@
 
         load(): Promise<any> {
             var templateLoaders = this._templateNames.map(name => this.templates[name] = new Template("/Templates/" + name + ".html")).map(template => (<any>template)._ready);
-            var contentLoader = this.service.getPersistentObject(null, "Bootstrap.Page", this.name).then(page => {
+            var contentLoader = this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(page => {
                 this.content = page.getAttributeValue("Content");
             });
             return Promise.all(templateLoaders.concat([contentLoader]));
@@ -82,9 +82,11 @@
         pageTarget: JQuery;
         errorTarget: JQuery;
 
-        constructor(private _serviceUri: string = "https://bootstrap.2sky.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks()) {
+        constructor(private _serviceUri: string = "https://bootstrap.2sky.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks(), private _website: string = null) {
             this.errorTarget = $("#error");
             this.pageTarget = $("#target");
+
+            hasher.prependHash = "!/";
         }
 
         get isLoading(): boolean {
@@ -93,6 +95,10 @@
 
         set isLoading(val: boolean) {
             $("#loading").toggleClass("show", this._isLoading = val);
+        }
+
+        get website(): string {
+            return this._website || this.service.userName;
         }
 
         get currentPage(): Vidyano.Pages.Page {
@@ -112,8 +118,8 @@
             });
         }
 
-        initialize(skipDefaultLogin: boolean = false): Promise<any> {
-            return this.execute(() => this.service.initialize(skipDefaultLogin));
+        initialize(): Promise<any> {
+            return this.execute(() => this.service.initialize().then(() => $(document.body).removeClass("initializing")));
         }
 
         executeError(err: any, work: () => Promise<any>, userCanRetry: boolean = true) {
