@@ -298,8 +298,8 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <PropertyGroup>
-    <PreBuildEvent>xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.dll" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y
-xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.pdb" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y</PreBuildEvent>
+    <PreBuildEvent>rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.dll" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y
+rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.pdb" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
         Other similar extension points exist, see Microsoft.Common.targets.
