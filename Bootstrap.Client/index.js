@@ -9,7 +9,7 @@ var BootstrapClient;
     var Index = (function (_super) {
         __extends(Index, _super);
         function Index() {
-            _super.call(this, "http://localhost/bootstrap");
+            _super.call(this);
 
             this.addPage(Test, "");
             this.addPage(Products, "Products");
