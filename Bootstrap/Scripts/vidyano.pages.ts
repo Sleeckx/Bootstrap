@@ -2,6 +2,7 @@
     export class Page {
         templates: { [key: string]: Template } = {};
         content: string;
+        autoRenderPageTemplate: boolean = true;
 
         constructor(public index: Index, public name: string, ...private _templateNames: string[]) {
             this.index.errorTarget.hide();
@@ -22,27 +23,48 @@
 
         render(target: JQuery) {
             this.index.pageTarget.attr("data-page", this.name);
+            if (this.autoRenderPageTemplate && this.templates[this.name])
+                target.html(this.templates[this.name].create(this));
+
             this.isLoading = false;
         }
 
         load(): Promise<any> {
+            if (this.autoRenderPageTemplate && this._templateNames.indexOf(this.name) == -1)
+                this._templateNames.push(this.name);
+
             var templateLoaders = this._templateNames.map(name => this.templates[name] = new Template("/Templates/" + name + ".html")).map(template => (<any>template)._ready);
-            var contentLoader = this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(page => {
-                this.content = page.getAttributeValue("Content");
-            });
-            return Promise.all(templateLoaders.concat([contentLoader]));
+            return Promise.all(templateLoaders);
         }
     }
 
     export class ContentPage extends Page {
-        constructor(index: Index, name: string) {
-            super(index, name);
-        }
-
         render(target: JQuery) {
             super.render(target);
 
             target.html(this.content);
+        }
+
+        load(): Promise<any> {
+            this.autoRenderPageTemplate = false;
+
+            return super.load().then(() => {
+                return this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(page => this.content = page.getAttributeValue("Content"));
+            });
+        }
+    }
+
+    export class CollectionPage extends Page {
+        private _collection: Query;
+
+        load(): Promise<any> {
+            return super.load().then(() => {
+                return this.service.getQuery(this.index.website + "_" + this.name).then(query => this._collection = query);
+            });
+        }
+
+        get items(): QueryResultItem[] {
+            return this._collection.items;
         }
     }
 
@@ -85,8 +107,6 @@
         constructor(private _serviceUri: string = "https://bootstrap.2sky.be", private _serviceHooks: Vidyano.ServiceHooks = new IndexServiceHooks(), private _website: string = null) {
             this.errorTarget = $("#error");
             this.pageTarget = $("#target");
-
-            hasher.prependHash = "!/";
         }
 
         get isLoading(): boolean {
@@ -115,6 +135,10 @@
                             this._currentPage.render(this.pageTarget);
                     });
                 });
+            });
+
+            crossroads.bypassed.add(() => {
+                console.log("Unabled to find match for route '" + arguments[0] + "'");
             });
         }
 
@@ -157,7 +181,7 @@
 
             return ready.then(() => {
                 var parseHash = newHash => crossroads.parse(newHash);
-                (<any>hasher).prependHash = "";
+                (<any>hasher).prependHash = "!/";
                 (<any>hasher).initialized.add(parseHash);
                 (<any>hasher).changed.add(parseHash);
                 (<any>hasher).init();

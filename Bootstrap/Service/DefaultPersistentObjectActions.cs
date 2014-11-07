@@ -26,10 +26,19 @@ namespace Bootstrap.Service
                 var isAdmin = Manager.Current.User.IsMemberOf(schemaName + "_Admin");
                 var isEditor = Manager.Current.User.IsMemberOf(schemaName + "_Edit");
 
-                if (isAdmin)
+                if (isAdmin || isEditor)
                 {
                     // Collections with CommonMark properties can have associated images on Azure storage
                     obj.Queries.Add(Manager.Current.GetQuery("AzureStorageImages"));
+
+                    commonMarkAttributes.Run(attr =>
+                    {
+                        attr.Column = 0;
+                        attr.ColumnSpan = 4;
+                        attr.DataTypeHints = "Height=400";
+                    });
+
+                    obj.StateBehavior = StateBehavior.StayInEdit;
                 }
 
                 using (var dbContext = new BootstrapEntityModelContainer())
@@ -53,7 +62,7 @@ namespace Bootstrap.Service
                                     fullBlob.Uri.ToString(),
                                     obj.FullTypeName.Replace('.', '_'),
                                     imageTitle,
-                                    thumbBlob.Uri.ToString());
+                                    thumbBlob.Uri.ToString()) + Environment.NewLine;
                             }));
 
                             attr.SetOriginalValue(content.ConvertFromCommonMark());

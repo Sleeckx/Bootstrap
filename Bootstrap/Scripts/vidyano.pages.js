@@ -17,6 +17,7 @@ var Vidyano;
                 this.name = name;
                 this._templateNames = _templateNames;
                 this.templates = {};
+                this.autoRenderPageTemplate = true;
                 this.index.errorTarget.hide();
                 this.index.pageTarget.empty();
             }
@@ -42,20 +43,23 @@ var Vidyano;
 
             Page.prototype.render = function (target) {
                 this.index.pageTarget.attr("data-page", this.name);
+                if (this.autoRenderPageTemplate && this.templates[this.name])
+                    target.html(this.templates[this.name].create(this));
+
                 this.isLoading = false;
             };
 
             Page.prototype.load = function () {
                 var _this = this;
+                if (this.autoRenderPageTemplate && this._templateNames.indexOf(this.name) == -1)
+                    this._templateNames.push(this.name);
+
                 var templateLoaders = this._templateNames.map(function (name) {
                     return _this.templates[name] = new Template("/Templates/" + name + ".html");
                 }).map(function (template) {
                     return template._ready;
                 });
-                var contentLoader = this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(function (page) {
-                    _this.content = page.getAttributeValue("Content");
-                });
-                return Promise.all(templateLoaders.concat([contentLoader]));
+                return Promise.all(templateLoaders);
             };
             return Page;
         })();
@@ -63,17 +67,53 @@ var Vidyano;
 
         var ContentPage = (function (_super) {
             __extends(ContentPage, _super);
-            function ContentPage(index, name) {
-                _super.call(this, index, name);
+            function ContentPage() {
+                _super.apply(this, arguments);
             }
             ContentPage.prototype.render = function (target) {
                 _super.prototype.render.call(this, target);
 
                 target.html(this.content);
             };
+
+            ContentPage.prototype.load = function () {
+                var _this = this;
+                this.autoRenderPageTemplate = false;
+
+                return _super.prototype.load.call(this).then(function () {
+                    return _this.service.getPersistentObject(null, _this.index.website + ".Page", _this.name).then(function (page) {
+                        return _this.content = page.getAttributeValue("Content");
+                    });
+                });
+            };
             return ContentPage;
         })(Page);
         Pages.ContentPage = ContentPage;
+
+        var CollectionPage = (function (_super) {
+            __extends(CollectionPage, _super);
+            function CollectionPage() {
+                _super.apply(this, arguments);
+            }
+            CollectionPage.prototype.load = function () {
+                var _this = this;
+                return _super.prototype.load.call(this).then(function () {
+                    return _this.service.getQuery(_this.index.website + "_" + _this.name).then(function (query) {
+                        return _this._collection = query;
+                    });
+                });
+            };
+
+            Object.defineProperty(CollectionPage.prototype, "items", {
+                get: function () {
+                    return this._collection.items;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return CollectionPage;
+        })(Page);
+        Pages.CollectionPage = CollectionPage;
 
         var Template = (function () {
             function Template(_file) {
@@ -121,8 +161,6 @@ var Vidyano;
                 this._isLoading = false;
                 this.errorTarget = $("#error");
                 this.pageTarget = $("#target");
-
-                hasher.prependHash = "!/";
             }
             Object.defineProperty(Index.prototype, "isLoading", {
                 get: function () {
@@ -164,6 +202,10 @@ var Vidyano;
                                 _this._currentPage.render(_this.pageTarget);
                         });
                     });
+                });
+
+                crossroads.bypassed.add(function () {
+                    console.log("Unabled to find match for route '" + arguments[0] + "'");
                 });
             };
 
@@ -215,7 +257,7 @@ var Vidyano;
                     var parseHash = function (newHash) {
                         return crossroads.parse(newHash);
                     };
-                    hasher.prependHash = "";
+                    hasher.prependHash = "!/";
                     hasher.initialized.add(parseHash);
                     hasher.changed.add(parseHash);
                     hasher.init();

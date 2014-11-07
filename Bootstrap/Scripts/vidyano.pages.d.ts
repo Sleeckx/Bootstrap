@@ -6,6 +6,7 @@
             [key: string]: Template;
         };
         public content: string;
+        public autoRenderPageTemplate: boolean;
         constructor(index: Index, name: string, ..._templateNames: string[]);
         public service : Service;
         public isLoading : boolean;
@@ -13,8 +14,13 @@
         public load(): Promise<any>;
     }
     class ContentPage extends Page {
-        constructor(index: Index, name: string);
         public render(target: JQuery): void;
+        public load(): Promise<any>;
+    }
+    class CollectionPage extends Page {
+        private _collection;
+        public load(): Promise<any>;
+        public items : QueryResultItem[];
     }
     class Template {
         private _file;

@@ -9,9 +9,10 @@ var BootstrapClient;
     var Index = (function (_super) {
         __extends(Index, _super);
         function Index() {
-            _super.call(this);
+            _super.call(this, "http://localhost/bootstrap");
 
             this.addPage(Test, "");
+            this.addPage(Products, "Products");
             this.start();
         }
         return Index;
@@ -26,6 +27,15 @@ var BootstrapClient;
         return Test;
     })(Vidyano.Pages.ContentPage);
     BootstrapClient.Test = Test;
+
+    var Products = (function (_super) {
+        __extends(Products, _super);
+        function Products(index, args) {
+            _super.call(this, index, "Products");
+        }
+        return Products;
+    })(Vidyano.Pages.CollectionPage);
+    BootstrapClient.Products = Products;
 })(BootstrapClient || (BootstrapClient = {}));
 
 $(function () {
