@@ -48,9 +48,6 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="CommonMark">
-      <HintPath>..\packages\CommonMark.NET.0.4.2\lib\net45\CommonMark.dll</HintPath>
-    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\packages\EntityFramework.6.1.1\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
@@ -146,7 +143,6 @@
     <Compile Include="Service\ImageProcessor.cs" />
     <Compile Include="Service\PageActions.cs" />
     <Compile Include="Service\WebsiteActions.cs" />
-    <Compile Include="StringHtmlExtensions.cs" />
     <Content Include="Global.asax" />
     <Content Include="Images\close.png" />
     <Content Include="Images\loading.gif" />
