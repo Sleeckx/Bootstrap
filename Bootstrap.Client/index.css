@@ -1,5 +1,14 @@
-﻿#target[data-page="ShippingPage"] h2 {
-  color: #175e77;
+﻿#target[data-page="Products"] .product {
+  border: 1px solid #eee;
+  padding: 12px;
+  margin: 12px 0;
+}
+#target[data-page="Products"] .product .description {
+  border-style: solid;
+  border-color: #eee;
+  border-width: 1px 0 0 1px;
+  margin: 24px 0 0 24px;
+  padding: 12px 0 0 12px;
 }
 .error {
   display: none;
