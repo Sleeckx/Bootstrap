@@ -12,7 +12,7 @@
           <Property Name="Title" Type="nvarchar" MaxLength="255" Nullable="false" />
           <Property Name="Domain" Type="nvarchar" MaxLength="255" />
           <Property Name="Email" Type="nvarchar" MaxLength="255" />
-          <Property Name="DynamicSchema_Id" Type="nvarchar" MaxLength="10" />
+          <Property Name="DynamicSchema_Id" Type="nvarchar" MaxLength="255" />
         </EntityType>
         <EntityContainer Name="BootstrapModelStoreContainer">
           <EntitySet Name="Websites" EntityType="Self.Websites" Schema="dbo" store:Type="Tables" />
@@ -31,7 +31,7 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="Title" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="Email" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
-          <Property Name="DynamicSchema_Id" Type="String" MaxLength="10" FixedLength="false" Unicode="true" />
+          <Property Name="DynamicSchema_Id" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
           <Property Name="Domain" Type="String" MaxLength="255" FixedLength="false" Unicode="true" />
         </EntityType>
         </Schema>
