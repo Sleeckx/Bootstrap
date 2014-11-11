@@ -2,18 +2,20 @@
     class Page {
         public index: Index;
         public name: string;
+        private _templateNames;
         public templates: {
             [key: string]: Template;
         };
         public content: string;
         public autoRenderPageTemplate: boolean;
-        constructor(index: Index, name: string, ..._templateNames: string[]);
+        constructor(index: Index, name: string, _templateNames?: string[]);
         public service : Service;
         public isLoading : boolean;
         public render(target: JQuery): void;
         public load(): Promise<any>;
     }
     class ContentPage extends Page {
+        constructor(index: Index, name: string, templateNames?: string[]);
         public render(target: JQuery): void;
         public load(): Promise<any>;
     }

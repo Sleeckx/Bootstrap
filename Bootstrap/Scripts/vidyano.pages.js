@@ -8,11 +8,8 @@ var Vidyano;
 (function (Vidyano) {
     (function (Pages) {
         var Page = (function () {
-            function Page(index, name) {
-                var _templateNames = [];
-                for (var _i = 0; _i < (arguments.length - 2); _i++) {
-                    _templateNames[_i] = arguments[_i + 2];
-                }
+            function Page(index, name, _templateNames) {
+                if (typeof _templateNames === "undefined") { _templateNames = []; }
                 this.index = index;
                 this.name = name;
                 this._templateNames = _templateNames;
@@ -45,8 +42,6 @@ var Vidyano;
                 this.index.pageTarget.attr("data-page", this.name);
                 if (this.autoRenderPageTemplate && this.templates[this.name])
                     target.html(this.templates[this.name].create(this));
-
-                this.isLoading = false;
             };
 
             Page.prototype.load = function () {
@@ -67,8 +62,11 @@ var Vidyano;
 
         var ContentPage = (function (_super) {
             __extends(ContentPage, _super);
-            function ContentPage() {
-                _super.apply(this, arguments);
+            function ContentPage(index, name, templateNames) {
+                if (typeof templateNames === "undefined") { templateNames = []; }
+                _super.call(this, index, name, templateNames);
+
+                this.autoRenderPageTemplate = false;
             }
             ContentPage.prototype.render = function (target) {
                 _super.prototype.render.call(this, target);
@@ -78,8 +76,6 @@ var Vidyano;
 
             ContentPage.prototype.load = function () {
                 var _this = this;
-                this.autoRenderPageTemplate = false;
-
                 return _super.prototype.load.call(this).then(function () {
                     return _this.service.getPersistentObject(null, _this.index.website + ".Page", _this.name).then(function (page) {
                         return _this.content = page.getAttributeValue("Content");
@@ -198,8 +194,10 @@ var Vidyano;
                     _this.execute(function () {
                         var page = _this._currentPage = new createPage(_this, args);
                         return page.load().then(function () {
-                            if (page = _this._currentPage)
+                            if (page = _this._currentPage) {
+                                page.isLoading = false;
                                 _this._currentPage.render(_this.pageTarget);
+                            }
                         });
                     });
                 });

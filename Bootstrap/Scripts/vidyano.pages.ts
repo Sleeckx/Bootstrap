@@ -4,7 +4,7 @@
         content: string;
         autoRenderPageTemplate: boolean = true;
 
-        constructor(public index: Index, public name: string, ...private _templateNames: string[]) {
+        constructor(public index: Index, public name: string, private _templateNames: string[]= []) {
             this.index.errorTarget.hide();
             this.index.pageTarget.empty();
         }
@@ -25,8 +25,6 @@
             this.index.pageTarget.attr("data-page", this.name);
             if (this.autoRenderPageTemplate && this.templates[this.name])
                 target.html(this.templates[this.name].create(this));
-
-            this.isLoading = false;
         }
 
         load(): Promise<any> {
@@ -39,6 +37,12 @@
     }
 
     export class ContentPage extends Page {
+        constructor(index: Index, name: string, templateNames: string[] = []) {
+            super(index, name, templateNames);
+
+            this.autoRenderPageTemplate = false;
+        }
+
         render(target: JQuery) {
             super.render(target);
 
@@ -46,8 +50,6 @@
         }
 
         load(): Promise<any> {
-            this.autoRenderPageTemplate = false;
-
             return super.load().then(() => {
                 return this.service.getPersistentObject(null, this.index.website + ".Page", this.name).then(page => this.content = page.getAttributeValue("Content"));
             });
@@ -131,8 +133,10 @@
                 this.execute(() => {
                     var page = this._currentPage = <Vidyano.Pages.Page>new createPage(this, args);
                     return page.load().then(() => {
-                        if (page = this._currentPage)
+                        if (page = this._currentPage) {
+                            page.isLoading = false;
                             this._currentPage.render(this.pageTarget);
+                        }
                     });
                 });
             });
