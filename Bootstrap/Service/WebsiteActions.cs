@@ -1,4 +1,5 @@
 using Microsoft.CSharp;
+using Microsoft.WindowsAzure.Storage.Blob;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace Bootstrap.Service
         {
             base.OnLoad(obj, parent);
 
-            var schema = Manager.Current.Dynamic.GetOrCreateSchema((string)obj["DynamicSchema_Id"]);
+            var schema = Manager.Current.Dynamic.GetOrCreateSchema((string)obj["DynamicSchema_Id"], false);
             if (schema != null)
             {
                 schema.Collections.Run(coll => obj.Queries.Add(coll.ToQuery()));
@@ -48,13 +49,37 @@ namespace Bootstrap.Service
                 pages.GetOrCreateProperty("Name", "Name", "Text", 10);
                 pages.GetOrCreateProperty("Content", "Content", "CommonMark", 20);
 
+                var images = schema.GetOrCreateCollection("Image", "Images");
+                images.GetOrCreateProperty("Name", "Name", "Text", 10);
+                images.GetOrCreateProperty("ImageThumb", "Image", "LongText", 20);
+                images.GetOrCreateProperty("Description", "Description", "LongText", 30);
+                images.GetOrCreateProperty("Image", "Image", "LongText", 40);
+
+                var builder = Manager.Current.GetBuilder();
+
+                var imagesPo = builder.GetOrCreatePersistentObject(schema.Name + ".Image");
+                imagesPo.Breadcrumb = "{Name}";
+                imagesPo.SortOptions = "Name ASC";
+                var keyAttr = imagesPo.GetOrCreateAttribute("Key");
+                keyAttr.Visibility = AttributeVisibility.Never;
+                keyAttr.IsReadOnly = true;
+
+                var imagesQueryBuilder = builder.GetOrCreateQuery(schema.Name + "_Images");
+                imagesQueryBuilder.Source = "Custom.Images";
+
+                builder.Save();
+
                 Manager.Current.GetUserOrGroup(schema.Name).AddToGroup("Users");
             }
         }
 
         public override void OnDelete(PersistentObject parent, IEnumerable<Website> entities, Query query, QueryResultItem[] selectedItems)
         {
-            entities.Run(e => Manager.Current.Dynamic.DeleteSchema(e.DynamicSchema_Id));
+            entities.Run(website =>
+            {
+                Manager.Current.Dynamic.DeleteSchema(website.DynamicSchema_Id);
+                ImagesController.ImagesContainer.ListBlobs(website.Name, true).OfType<CloudBlockBlob>().Run(blob => blob.DeleteIfExists());
+            });
             base.OnDelete(parent, entities, query, selectedItems);
         }
 

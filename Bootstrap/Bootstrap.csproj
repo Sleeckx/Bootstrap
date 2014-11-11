@@ -86,6 +86,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.2.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -110,9 +111,9 @@
     <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
-    <Reference Include="Vidyano.Service, Version=5.0.35305.3417, Culture=neutral, PublicKeyToken=d51b97a7f46ba8b6, processorArchitecture=MSIL">
+    <Reference Include="Vidyano.Service, Version=5.0.35801.3419, Culture=neutral, PublicKeyToken=d51b97a7f46ba8b6, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Vidyano.Service.5.0.35305.3417\lib\net45\Vidyano.Service.dll</HintPath>
+      <HintPath>..\packages\Vidyano.Service.5.0.35801.3419\lib\net45\Vidyano.Service.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
   </ItemGroup>
@@ -143,6 +144,7 @@
     <Compile Include="Service\ImageProcessor.cs" />
     <Compile Include="Service\PageActions.cs" />
     <Compile Include="Service\WebsiteActions.cs" />
+    <Compile Include="Websites\DeBergkristal.cs" />
     <Content Include="Global.asax" />
     <Content Include="Images\close.png" />
     <Content Include="Images\loading.gif" />
@@ -294,8 +296,8 @@
     <Error Condition="!Exists('$(SolutionDir)\.nuget\NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '$(SolutionDir)\.nuget\NuGet.targets'))" />
   </Target>
   <PropertyGroup>
-    <PreBuildEvent>rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.dll" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y
-rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.pdb" P:\Bootstrap\packages\Vidyano.Service.5.0.35305.3417\lib\net45 /y</PreBuildEvent>
+    <PreBuildEvent>rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.dll" P:\Bootstrap\packages\Vidyano.Service.5.0.35801.3419\lib\net45 /y
+rem xcopy "P:\VidyanoV5\Vidyano.Service\bin\Debug\Vidyano.Service.pdb" P:\Bootstrap\packages\Vidyano.Service.5.0.35801.3419\lib\net45 /y</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
         Other similar extension points exist, see Microsoft.Common.targets.
