@@ -17,7 +17,7 @@
 
     export class Products extends Vidyano.Pages.CollectionPage {
         constructor(index: Index, args: IArguments) {
-            super(index, "Products");
+            super("Products", index, "Products");
         }
     }
 }

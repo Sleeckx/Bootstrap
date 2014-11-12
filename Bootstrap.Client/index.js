@@ -31,7 +31,7 @@ var BootstrapClient;
     var Products = (function (_super) {
         __extends(Products, _super);
         function Products(index, args) {
-            _super.call(this, index, "Products");
+            _super.call(this, "Products", index, "Products");
         }
         return Products;
     })(Vidyano.Pages.CollectionPage);

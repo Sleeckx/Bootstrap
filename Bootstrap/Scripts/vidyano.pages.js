@@ -88,13 +88,18 @@ var Vidyano;
 
         var CollectionPage = (function (_super) {
             __extends(CollectionPage, _super);
-            function CollectionPage() {
-                _super.apply(this, arguments);
+            function CollectionPage(collectionName, index, name, templateNames) {
+                if (typeof name === "undefined") { name = null; }
+                if (typeof templateNames === "undefined") { templateNames = []; }
+                _super.call(this, index, name || collectionName, templateNames);
+                this.collectionName = collectionName;
+
+                this.autoRenderPageTemplate = false;
             }
             CollectionPage.prototype.load = function () {
                 var _this = this;
                 return _super.prototype.load.call(this).then(function () {
-                    return _this.service.getQuery(_this.index.website + "_" + _this.name).then(function (query) {
+                    return _this.service.getQuery(_this.index.website + "_" + _this.collectionName).then(function (query) {
                         return _this._collection = query;
                     });
                 });

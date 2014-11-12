@@ -59,9 +59,15 @@
     export class CollectionPage extends Page {
         private _collection: Query;
 
+        constructor(public collectionName: string, index: Index, name: string = null, templateNames: string[]= []) {
+            super(index, name || collectionName, templateNames);
+
+            this.autoRenderPageTemplate = false;
+        }
+
         load(): Promise<any> {
             return super.load().then(() => {
-                return this.service.getQuery(this.index.website + "_" + this.name).then(query => this._collection = query);
+                return this.service.getQuery(this.index.website + "_" + this.collectionName).then(query => this._collection = query);
             });
         }
 

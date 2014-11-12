@@ -20,7 +20,9 @@
         public load(): Promise<any>;
     }
     class CollectionPage extends Page {
+        public collectionName: string;
         private _collection;
+        constructor(collectionName: string, index: Index, name?: string, templateNames?: string[]);
         public load(): Promise<any>;
         public items : QueryResultItem[];
     }
