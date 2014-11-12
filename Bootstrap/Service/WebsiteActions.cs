@@ -35,7 +35,7 @@ namespace Bootstrap.Service
         {
             if (obj.IsNew)
             {
-                var name = (string)obj.GetAttributeValue("Name");
+                var name = (string)obj["Name"];
                 if (!string.IsNullOrWhiteSpace(name))
                     obj["DynamicSchema_Id"] = ValidIdentifier(name);
             }
@@ -100,7 +100,7 @@ namespace Bootstrap.Service
 
         internal static Website GetWebsite(PersistentObject obj)
         {
-            if(obj == null)
+            if (obj == null)
                 return null;
 
             using (var context = new BootstrapEntityModelContainer())

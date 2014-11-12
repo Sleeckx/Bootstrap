@@ -13,7 +13,7 @@ namespace Bootstrap.Service
     public class PageActions<TEntity> : DefaultPersistentObjectActions<TEntity>
         where TEntity : class, ICollectionEntity
     {
-        public override void OnLoad(Vidyano.Service.Repository.PersistentObject obj, Vidyano.Service.Repository.PersistentObject parent)
+        public override void OnLoad(PersistentObject obj, PersistentObject parent)
         {
             Guid pageId;
             if (!Guid.TryParse(obj.ObjectId, out pageId))
@@ -26,8 +26,10 @@ namespace Bootstrap.Service
 
                     var schema = Manager.Current.Dynamic.GetOrCreateSchema(Manager.Current.User.Name);
                     var pageCollection = schema.GetOrCreateCollection("Page");
-                    var pages = Manager.Current.ExecuteQuery(pageCollection.ToQuery());
-                    var page = pages.Items.FirstOrDefault(pageItem => pageItem.GetValue("Name") == obj.ObjectId);
+                    var pagesQuery = pageCollection.ToQuery();
+                    pagesQuery.TextSearch = "Name:\"" + obj.ObjectId + "\"";
+                    var pages = Manager.Current.ExecuteQuery(pagesQuery);
+                    var page = pages.Items.FirstOrDefault(pageItem => pageItem["Name"] == obj.ObjectId);
                     if (page == null)
                         throw new InvalidOperationException("The requested page was not found.");
 

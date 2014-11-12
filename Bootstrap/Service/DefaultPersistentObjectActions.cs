@@ -1,14 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Objects;
-using System.Data.Entity.Core.Objects.DataClasses;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Vidyano.Core.Extensions;
 using Vidyano.Service.Dynamic;
 using Vidyano.Service.Repository;
@@ -30,7 +26,7 @@ namespace Bootstrap.Service
         {
             base.OnConstruct(obj);
 
-            var commonMarkAttributes = obj.Attributes.Where(attr => attr.DataType.Type == "CommonMark").ToArray();
+            var commonMarkAttributes = obj.Attributes.Where(attr => attr.DataType.Type == DataTypes.CommonMark).ToArray();
             if (commonMarkAttributes.Length > 0)
             {
                 if (IsReadOnly)
@@ -41,40 +37,13 @@ namespace Bootstrap.Service
                     PersistentObjectAttribute imagesAttribute;
                     if (obj.TryGetAttribute("Images", out imagesAttribute))
                         obj.Attributes.Remove(imagesAttribute);
-                }
-            }
-
-            obj.Attributes.Where(a => a.DataType.Type == DataTypes.NullableBoolean).Run(a => a.DataType = Manager.Current.GetDataType(DataTypes.YesNo));
-        }
-
-        public override void OnNew(PersistentObject obj, PersistentObject parent, Query query, Dictionary<string, string> parameters)
-        {
-            base.OnNew(obj, parent, query, parameters);
-
-            obj.Attributes.Where(a => a.DataType.Type == DataTypes.YesNo).Run(a => a.SetOriginalValue(false));
-        }
-
-        public override void OnLoad(Vidyano.Service.Repository.PersistentObject obj, Vidyano.Service.Repository.PersistentObject parent)
-        {
-            base.OnLoad(obj, parent);
-
-            if (obj.HasError)
-                return;
-
-            var commonMarkAttributes = obj.Attributes.Where(a => a.DataType.Type == "CommonMark").ToArray();
-            if (commonMarkAttributes.Length > 0)
-            {
-                var schemaName = obj.FullTypeName.Split('.')[0];
-
-                if (!IsReadOnly)
-                {
-                    // Collections with CommonMark properties can have associated images
-                    PersistentObjectAttribute imagesAttribute;
-                    if (!obj.TryGetAttribute("Images", out imagesAttribute))
+                    else
                     {
+                        // Collections with CommonMark properties can have associated images
+                        var schemaName = obj.FullTypeName.Split('.')[0];
                         var schema = Manager.Current.Dynamic.GetOrCreateSchema(schemaName);
                         var collection = schema.GetOrCreateCollection(obj.Type);
-                        var imagesProperty = collection.GetOrCreateProperty("Images", offset: 100000, dataType: "MultiLineString");
+                        collection.GetOrCreateProperty("Images", offset: 100000, dataType: "MultiLineString");
 
                         var builder = Manager.Current.GetBuilder();
                         var poBuilder = builder.GetOrCreatePersistentObject(obj.FullTypeName);
@@ -83,7 +52,26 @@ namespace Bootstrap.Service
                         imagesAttributeBuilder.Visibility = AttributeVisibility.Query;
                         builder.Save();
                     }
+                }
+            }
 
+            obj.Attributes.Where(a => a.DataType.Type == DataTypes.NullableBoolean).Run(a => a.DataType = DataTypes.YesNo);
+        }
+
+        public override void OnLoad(PersistentObject obj, PersistentObject parent)
+        {
+            base.OnLoad(obj, parent);
+
+            if (obj.HasError)
+                return;
+
+            var commonMarkAttributes = obj.Attributes.Where(a => a.DataType.Type == DataTypes.CommonMark).ToArray();
+            if (commonMarkAttributes.Length > 0)
+            {
+                var schemaName = obj.FullTypeName.Split('.')[0];
+
+                if (!IsReadOnly)
+                {
                     obj.Queries.Add(Manager.Current.GetQuery(schemaName + "_Images"));
 
                     commonMarkAttributes.Run(attr =>
@@ -94,19 +82,12 @@ namespace Bootstrap.Service
                     });
 
                     obj.StateBehavior = StateBehavior.StayInEdit;
-
-                    obj.Attributes.Where(a => a.DataType.Type == DataTypes.NullableBoolean).Run(a => a.DataType = Manager.Current.GetDataType(DataTypes.YesNo));
                 }
-
-                if (IsReadOnly)
+                else
                 {
                     // If the current user isn't an editor or administrator, convert the CommonMark to HTML
-                    using (var dbContext = new BootstrapEntityModelContainer())
-                    {
-                        var website = dbContext.Websites.First(ws => ws.DynamicSchema_Id == schemaName);
-                        var images = JArray.Parse((string)obj.GetAttributeValue("Images") ?? "[]");
-                        commonMarkAttributes.Run(attr => attr.SetOriginalValue(CommonMarkToHTML(website, obj.Type, (string)attr.GetValue(), images)));
-                    }
+                    var images = JArray.Parse((string)obj["Images"] ?? "[]");
+                    commonMarkAttributes.Run(attr => attr.SetOriginalValue(CommonMarkToHTML(obj.Type, (string)attr, images)));
                 }
             }
         }
@@ -115,7 +96,7 @@ namespace Bootstrap.Service
         {
             if (parent != null && parent.FullTypeName == "Bootstrap.Website" && query.PersistentObject.Type != "Image")
             {
-                var dynQuery = ((ObjectQuery<TEntity>)DynamicContext.Query(query.PersistentObject));
+                var dynQuery = GetSource(query.PersistentObject);
                 selectedItems.Run(item =>
                 {
                     var id = Guid.Parse(item.Id);
@@ -140,39 +121,29 @@ namespace Bootstrap.Service
             if (IsReadOnly)
             {
                 // If the current user isn't an editor or administrator, convert the CommonMark to HTML
-                var commonMarkColumns = args.Query.Columns.Where(col => col.Attribute.DataType.Type == "CommonMark").ToArray();
+                var commonMarkColumns = args.Query.Columns.Where(col => col.Type == DataTypes.CommonMark).ToArray();
                 if (commonMarkColumns.Length > 0)
                 {
-                    var schemaName = args.Query.PersistentObject.FullTypeName.Split('.')[0];
-
-                    using (var dbContext = new BootstrapEntityModelContainer())
+                    args.Result.Items.Run(item =>
                     {
-                        var website = dbContext.Websites.First(ws => ws.DynamicSchema_Id == schemaName);
+                        var images = JArray.Parse(item["Images"] ?? "[]");
+                        commonMarkColumns.Run(col => { item.SetValue(col.Name, CommonMarkToHTML(args.Query.PersistentObject.Type, item[col.Name], images)); });
 
-                        args.Result.Items.Run(item =>
+                        // Clean up image data for client
+                        item.SetValue("Images", new JArray(images.Select(image =>
                         {
-                            var images = JArray.Parse(item.GetValue("Images") ?? "[]");
-                            commonMarkColumns.Run(col =>
-                            {
-                                item.SetValue(col.Name, CommonMarkToHTML(website, args.Query.PersistentObject.Type, item.GetValue(col.Name), images));
-                            });
+                            var newImage = new JObject();
+                            newImage["Image"] = (string)image["Image"];
+                            newImage["ImageThumb"] = (string)image["ImageThumb"];
 
-                            // Clean up image data for client
-                            item.SetValue("Images", new JArray(images.Select(image =>
-                            {
-                                var newImage = new JObject();
-                                newImage["Image"] = (string)image["Image"];
-                                newImage["ImageThumb"] = (string)image["ImageThumb"];
-
-                                return newImage;
-                            }).ToArray()).ToString(Formatting.None));
-                        });
-                    }
+                            return newImage;
+                        })).ToString(Formatting.None));
+                    });
                 }
             }
         }
 
-        protected virtual string CommonMarkToHTML(Website website, string collection, string value, JArray images, bool addRemainingImages = false)
+        protected virtual string CommonMarkToHTML(string collection, string value, JArray images, bool addRemainingImages = false)
         {
             if (String.IsNullOrEmpty(value))
             {
@@ -183,7 +154,7 @@ namespace Bootstrap.Service
             }
 
             var unusedImages = images.ToList();
-            var html = Regex.Replace(value, @"\((.+?)\)", new MatchEvaluator(match =>
+            var html = Regex.Replace(value, @"\((.+?)\)", match =>
             {
                 var imageName = match.Groups[1].Value;
 
@@ -193,12 +164,12 @@ namespace Bootstrap.Service
 
                 unusedImages.Remove(imageMatch);
 
-                return string.Format(@"<a class='bootstrap-image-link' href='{0}' data-lightbox='{1}' data-title='{2}'><img class='bootstrap-image' src='{3}' alt='' /></a>",
+                return CreateLightBoxLink(
                     (string)imageMatch["Image"],
                     collection,
                     (string)imageMatch["Description"],
                     (string)imageMatch["ImageThumb"]);
-            }));
+            });
 
             if (addRemainingImages)
             {
@@ -206,7 +177,7 @@ namespace Bootstrap.Service
                 sb.AppendLine();
                 sb.AppendLine();
 
-                unusedImages.Run(image => sb.Append(CreateLightBoxLink((string)image["Image"], (string)image["ImageThumb"], (string)image["Description"], collection)));
+                unusedImages.Run(image => sb.AppendLine(CreateLightBoxLink((string)image["Image"], (string)image["ImageThumb"], (string)image["Description"], collection)));
 
                 html = sb.ToString();
             }
@@ -216,8 +187,8 @@ namespace Bootstrap.Service
 
         protected virtual string CreateLightBoxLink(string image, string thumb, string desc, string group)
         {
-            return string.Format(@"<a class='bootstrap-image-link' href='{0}' data-lightbox='{1}' data-title='{2}'><img class='bootstrap-image' src='{3}' alt='' /></a>",
-                image, group, desc, thumb) + Environment.NewLine;
+            return string.Format("<a class='bootstrap-image-link' href='{0}' data-lightbox='{1}' data-title='{2}'><img class='bootstrap-image' src='{3}' alt='' /></a>",
+                image, group, desc, thumb);
         }
     }
 }

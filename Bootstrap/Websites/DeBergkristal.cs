@@ -1,6 +1,4 @@
 ﻿using Bootstrap.Service;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -14,12 +12,12 @@ using Vidyano.Service.Repository;
 namespace Bootstrap.Websites
 {
     [Schema("DeBergkristal")]
-    public class PageActions<TEntity> : Bootstrap.Service.PageActions<TEntity>
+    public class PageActions<TEntity> : Service.PageActions<TEntity>
         where TEntity : class, ICollectionEntity
     {
-        protected override string CommonMarkToHTML(Website website, string collection, string value, JArray images, bool addRemainingImages = false)
+        protected override string CommonMarkToHTML(string collection, string value, JArray images, bool addRemainingImages = false)
         {
-            return base.CommonMarkToHTML(website, collection, value, images, true);
+            return base.CommonMarkToHTML(collection, value, images, true);
         }
     }
 
@@ -27,9 +25,9 @@ namespace Bootstrap.Websites
     public class ProductActions<TEntity> : DefaultPersistentObjectActions<TEntity>
         where TEntity : class, ICollectionEntity
     {
-        protected override string CommonMarkToHTML(Website website, string collection, string value, JArray images, bool addRemainingImages = false)
+        protected override string CommonMarkToHTML(string collection, string value, JArray images, bool addRemainingImages = false)
         {
-            return base.CommonMarkToHTML(website, collection, value, images, true);
+            return base.CommonMarkToHTML(collection, value, images, true);
         }
     }
 
@@ -48,13 +46,13 @@ namespace Bootstrap.Websites
         {
             base.OnNew(obj, parent, query, parameters);
 
-            obj.SetAttributeValue("On", DateTime.Now);
+            obj.SetAttributeValue("On", Manager.Current.Now);
             obj["On"].IsReadOnly = true;
         }
 
-        protected override string CommonMarkToHTML(Website website, string collection, string value, JArray images, bool addRemainingImages = false)
+        protected override string CommonMarkToHTML(string collection, string value, JArray images, bool addRemainingImages = false)
         {
-            return base.CommonMarkToHTML(website, collection, value, images, true);
+            return base.CommonMarkToHTML(collection, value, images, true);
         }
     }
 }

@@ -1,14 +1,13 @@
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity.Core.Metadata.Edm;
+using System.Data.Entity.Core;
 using System.Data.Entity.Core.Objects;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Runtime.Remoting.Messaging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Vidyano.Core.Extensions;
 using Vidyano.Service.Dynamic;
 using Vidyano.Service.Repository;
@@ -35,10 +34,9 @@ namespace Bootstrap.Service
     {
         public static ObjectContext GetImagesParent(this PersistentObject obj, out IImages entity)
         {
-            var context = ((ObjectQuery)DynamicContext.Query(obj)).Context;
-            var container = context.MetadataWorkspace.GetEntityContainer(context.DefaultContainerName, DataSpace.CSpace);
-            var entitySet = container.BaseEntitySets.Single();
-            entity = context.GetObjectByKey(new System.Data.Entity.Core.EntityKey("CodeFirstContainer." + entitySet.Name, "Id", Guid.Parse(obj.ObjectId))) as IImages;
+            var objectQuery = (ObjectQuery)DynamicContext.Query(obj);
+            var context = objectQuery.Context;
+            entity = context.GetObjectByKey(new EntityKey("CodeFirstContainer." + objectQuery.GetResultType().EdmType.Name, "Id", Guid.Parse(obj.ObjectId))) as IImages;
 
             return context;
         }
@@ -46,7 +44,7 @@ namespace Bootstrap.Service
         public static IImage AsIImage<TEntity>(this JToken jImage)
             where TEntity : new()
         {
-            var image = new TEntity() as IImage;
+            var image = (IImage)new TEntity();
 
             image.Id = (Guid)jImage["Id"];
             image.Name = (string)jImage["Name"];
@@ -63,10 +61,10 @@ namespace Bootstrap.Service
                 jImage = new JObject();
 
             jImage["Id"] = !string.IsNullOrEmpty(obj.ObjectId) ? obj.ObjectId : Guid.NewGuid().ToString();
-            jImage["Name"] = (string)obj.GetAttributeValue("Name");
-            jImage["Description"] = (string)obj.GetAttributeValue("Description");
-            jImage["Image"] = (string)obj.GetAttributeValue("Image");
-            jImage["ImageThumb"] = (string)obj.GetAttributeValue("ImageThumb");
+            jImage["Name"] = (string)obj["Name"];
+            jImage["Description"] = (string)obj["Description"];
+            jImage["Image"] = (string)obj["Image"];
+            jImage["ImageThumb"] = (string)obj["ImageThumb"];
 
             return jImage;
         }
@@ -76,7 +74,7 @@ namespace Bootstrap.Service
             if (parent == null)
                 throw new InvalidOperationException("Images must have a parent.");
 
-            var key = parent.FullTypeName == "Bootstrap.Website" ? (string)parent.GetAttributeValue("DynamicSchema_Id") : parent.FullTypeName + "." + (objectId ?? parent.ObjectId);
+            var key = parent.FullTypeName == "Bootstrap.Website" ? (string)parent["DynamicSchema_Id"] : parent.FullTypeName + "." + (objectId ?? parent.ObjectId);
             return key.Replace(".", "/") + "/" + (thumbs ? "thumbs/" : null);
         }
     }
@@ -89,7 +87,7 @@ namespace Bootstrap.Service
             base.OnConstruct(obj);
 
             var imageThumbAttr = obj["ImageThumb"];
-            imageThumbAttr.DataType = Manager.Current.GetDataType("ImageByUrl");
+            imageThumbAttr.DataType = "ImageByUrl";
             imageThumbAttr.DataTypeHints = "Height=64; Width=64";
 
             obj["Image"].Visibility = AttributeVisibility.New;
@@ -100,7 +98,7 @@ namespace Bootstrap.Service
             base.OnLoad(obj, parent);
 
             var imageThumbAttr = obj["ImageThumb"];
-            imageThumbAttr.Options = new[] { (string)obj.GetAttributeValue("Image") };
+            imageThumbAttr.Options = new[] { (string)obj["Image"] };
             imageThumbAttr.IsReadOnly = true;
             obj["Name"].IsReadOnly = true;
             obj["Name"].Visibility = AttributeVisibility.Never;
@@ -131,7 +129,7 @@ namespace Bootstrap.Service
 
             base.OnNew(obj, parent, query, parameters);
 
-            obj["Image"].DataType = Manager.Current.GetDataType("Image");
+            obj["Image"].DataType = DataTypes.Image;
             obj["Image"].AddRule("Required");
 
             obj["Name"].Visibility = AttributeVisibility.Never;
@@ -148,16 +146,16 @@ namespace Bootstrap.Service
             if (CheckRules(obj))
             {
                 var imageAttr = obj["Image"];
-                var imageData = Convert.FromBase64String((string)imageAttr.GetValue());
+                var imageData = (byte[])imageAttr;
 
                 try
                 {
-                    using (var img = System.Drawing.Image.FromStream(new System.IO.MemoryStream(imageData)))
+                    using (var img = Image.FromStream(new MemoryStream(imageData)))
                     {
-                        if (img.RawFormat.Guid != System.Drawing.Imaging.ImageFormat.Bmp.Guid &&
-                            img.RawFormat.Guid != System.Drawing.Imaging.ImageFormat.Gif.Guid &&
-                            img.RawFormat.Guid != System.Drawing.Imaging.ImageFormat.Jpeg.Guid &&
-                            img.RawFormat.Guid != System.Drawing.Imaging.ImageFormat.Png.Guid)
+                        if (img.RawFormat.Guid != ImageFormat.Bmp.Guid &&
+                            img.RawFormat.Guid != ImageFormat.Gif.Guid &&
+                            img.RawFormat.Guid != ImageFormat.Jpeg.Guid &&
+                            img.RawFormat.Guid != ImageFormat.Png.Guid)
                             throw new Exception();
                     }
                 }
@@ -166,10 +164,10 @@ namespace Bootstrap.Service
                     throw new InvalidOperationException(Manager.Current.GetTranslatedMessage("InvalidImage"));
                 }
 
-                var imageUri = UploadImage(obj.Parent.GetImagePath() + (string)obj.GetAttributeValue("Name"), imageData);
-                var imageThumbUri = UploadImage(obj.Parent.GetImagePath(thumbs: true) + (string)obj.GetAttributeValue("Name"), ImageProcessor.ResizeImage(imageData, 200));
+                var imageUri = UploadImage(obj.Parent.GetImagePath() + (string)obj["Name"], imageData);
+                var imageThumbUri = UploadImage(obj.Parent.GetImagePath(thumbs: true) + (string)obj["Name"], ImageProcessor.ResizeImage(imageData, 200));
 
-                imageAttr.DataType = Manager.Current.GetDataType("String");
+                imageAttr.DataType = DataTypes.String;
                 imageAttr.SetValue(imageUri);
                 obj["ImageThumb"].SetValue(imageThumbUri);
 
@@ -224,8 +222,8 @@ namespace Bootstrap.Service
 
                 selectedItems.Run(item =>
                 {
-                    ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath() + item.GetValue("Name")).DeleteIfExists();
-                    ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath(thumbs: true) + item.GetValue("Name")).DeleteIfExists();
+                    ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath() + item["Name"]).DeleteIfExists();
+                    ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath(thumbs: true) + item["Name"]).DeleteIfExists();
                 });
             }
             else
@@ -241,8 +239,8 @@ namespace Bootstrap.Service
                             var image = images.FirstOrDefault(img => ((string)img["Id"]) == item.Id);
                             images.Remove(image);
 
-                            ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath() + item.GetValue("Name")).DeleteIfExists();
-                            ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath(thumbs: true) + item.GetValue("Name")).DeleteIfExists();
+                            ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath() + item["Name"]).DeleteIfExists();
+                            ImagesController.ImagesContainer.GetBlockBlobReference(parent.GetImagePath(thumbs: true) + item["Name"]).DeleteIfExists();
                         });
 
                         imagesParent.Images = images.ToString(Formatting.None);
@@ -255,7 +253,7 @@ namespace Bootstrap.Service
         public IEnumerable<TEntity> Images(CustomQueryArgs e)
         {
             if (e.Parent.FullTypeName == "Bootstrap.Website")
-                return ((ObjectQuery<TEntity>)DynamicContext.Query(e.Query.PersistentObject, Context)).ToArray();
+                return GetSource(e.Query.PersistentObject);
 
             IImages imagesParent;
             using (e.Parent.GetImagesParent(out imagesParent))
@@ -267,7 +265,7 @@ namespace Bootstrap.Service
             return Empty<TEntity>.Array;
         }
 
-        private string UploadImage(string name, byte[] image)
+        private static string UploadImage(string name, byte[] image)
         {
             var blob = ImagesController.ImagesContainer.GetBlockBlobReference(name);
             blob.UploadFromByteArray(image, 0, image.Length);
@@ -287,8 +285,6 @@ namespace Bootstrap.Service
                     break;
                 case ".bmp":
                     blob.Properties.ContentType = "image/bmp";
-                    break;
-                default:
                     break;
             }
             blob.SetProperties();
