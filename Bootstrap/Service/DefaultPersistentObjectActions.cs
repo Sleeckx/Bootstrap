@@ -166,9 +166,9 @@ namespace Bootstrap.Service
 
                 return CreateLightBoxLink(
                     (string)imageMatch["Image"],
-                    collection,
+                    (string)imageMatch["ImageThumb"],
                     (string)imageMatch["Description"],
-                    (string)imageMatch["ImageThumb"]);
+                    collection);
             });
 
             if (addRemainingImages)
