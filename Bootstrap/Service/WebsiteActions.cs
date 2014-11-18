@@ -112,5 +112,14 @@ namespace Bootstrap.Service
                 return context.Websites.FirstOrDefault(website => website.DynamicSchema_Id == schemaName);
             }
         }
+
+        protected override Source<Website> Where(Source<Website> source, Query query)
+        {
+            if(Manager.Current.User.IsMemberOf("Administrators"))
+                return base.Where(source, query);
+
+            var groupNames = Manager.Current.User.Groups.Select(g => g.Name).Where(n => !n.Contains("_")).ToArray();
+            return base.Where(source, query).Where(ws => groupNames.Contains(ws.DynamicSchema_Id));
+        }
     }
 }
