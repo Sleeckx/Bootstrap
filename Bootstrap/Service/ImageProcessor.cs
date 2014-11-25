@@ -28,6 +28,20 @@ namespace Bootstrap.Service
             bmp.StreamSource = new MemoryStream(data);
             bmp.EndInit();
 
+            var rotation = 0;
+            try
+            {
+                var jpegDecoder = new JpegBitmapDecoder(new MemoryStream(data), BitmapCreateOptions.None, BitmapCacheOption.None);
+                var r = Convert.ToInt32(((BitmapMetadata)jpegDecoder.Frames[0].Metadata).GetQuery("/app1/ifd/exif:{uint=274}"));
+                if (r == 3)
+                    rotation = 180;
+                else if (r == 8)
+                    rotation = 270;
+                else if (r == 6)
+                    rotation = 90;
+            }
+            catch { }
+
             var source = (BitmapSource)bmp;
             if (source.CanFreeze)
                 source.Freeze();
@@ -54,6 +68,17 @@ namespace Bootstrap.Service
                 resizedImage.Render(drawingVisual);
 
                 source = resizedImage;
+
+                if (rotation > 0)
+                {
+                    var rotatedBitmap = new TransformedBitmap();
+                    rotatedBitmap.BeginInit();
+                    rotatedBitmap.Source = source;
+                    rotatedBitmap.Transform = new RotateTransform(rotation);
+                    rotatedBitmap.EndInit();
+
+                    source = rotatedBitmap;
+                }
             }
 
             // NOTE: Save as both png/jpg and use smallest size
