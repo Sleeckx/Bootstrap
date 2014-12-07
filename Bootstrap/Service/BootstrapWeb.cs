@@ -41,7 +41,7 @@ namespace Bootstrap.Service
                 using (var context = new BootstrapEntityModelContainer())
                 {
                     var domain = HttpContext.Request.UrlReferrer.Authority.ToString();
-                    var website = context.Websites.FirstOrDefault(ws => ws.Domain == domain);
+                    var website = context.Websites.FirstOrDefault(ws => ws.Domain == domain || ws.Domain.Contains("\n" + domain + "\n") || ws.Domain.StartsWith(domain + "\n") || ws.Domain.EndsWith("\n" + domain));
                     if (website == null)
                         return null;
 
